@@ -13,7 +13,7 @@
         android:gravity="center_vertical"
         android:text="@string/screen_main_title"
         android:textColor="@color/white"
-        android:textSize="22sp"
+        android:textSize="@dimen/primary_text_size"
         android:textStyle="bold" />
 
     <Button
@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="24dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="@dimen/medium_padding"
         android:layout_weight="1"
         android:backgroundTint="@color/white"
         android:foreground="?attr/selectableItemBackground"
@@ -29,18 +29,18 @@
         android:text="@string/screen_main_button_search_title"
         android:textAllCaps="false"
         android:textColor="@color/yp_black"
-        android:textSize="22sp"
-        app:cornerRadius="16dp"
+        android:textSize="@dimen/primary_text_size"
+        app:cornerRadius="@dimen/primary_corner_radius"
         app:icon="@drawable/ic_search_magnifier"
         app:iconGravity="textStart"
-        app:iconPadding="8dp"
+        app:iconPadding="@dimen/medium_padding"
         app:iconTint="@color/yp_black" />
 
     <Button
         android:id="@+id/button_media_library"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="@dimen/medium_padding"
         android:layout_weight="1"
         android:backgroundTint="@color/white"
         android:foreground="?attr/selectableItemBackground"
@@ -48,11 +48,11 @@
         android:text="@string/screen_main_button_media_library"
         android:textAllCaps="false"
         android:textColor="@color/yp_black"
-        android:textSize="22sp"
-        app:cornerRadius="16dp"
+        android:textSize="@dimen/primary_text_size"
+        app:cornerRadius="@dimen/primary_corner_radius"
         app:icon="@drawable/ic_media_library"
         app:iconGravity="textStart"
-        app:iconPadding="8dp"
+        app:iconPadding="@dimen/medium_padding"
         app:iconTint="@color/yp_black" />
 
     <Button
@@ -67,10 +67,10 @@
         android:text="@string/screen_main_button_settings"
         android:textAllCaps="false"
         android:textColor="@color/yp_black"
-        android:textSize="22sp"
-        app:cornerRadius="16dp"
+        android:textSize="@dimen/primary_text_size"
+        app:cornerRadius="@dimen/primary_corner_radius"
         app:icon="@drawable/ic_settings"
         app:iconGravity="textStart"
-        app:iconPadding="8dp"
+        app:iconPadding="@dimen/medium_padding"
         app:iconTint="@color/yp_black" />
 </LinearLayout>
