@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,15 +17,16 @@
             android:id="@+id/button_back"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:layout_marginStart="4dp"
             android:background="@null"
-            android:src="@drawable/ic_back"
             android:scaleType="center"
+            android:src="@drawable/ic_back_arrow_24"
             app:tint="@color/yp_black" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="12dp"
             android:ellipsize="end"
             android:text="@string/screen_settings_title"
             android:textColor="@color/yp_black"
@@ -43,6 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/big_padding"
             android:includeFontPadding="false"
             android:text="@string/screen_settings_dark_theme_title"
             android:textColor="@color/yp_black"
@@ -52,6 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="6dp"
             android:checked="true"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
     </FrameLayout>
@@ -64,6 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/big_padding"
             android:includeFontPadding="false"
             android:text="@string/screen_settings_share_title"
             android:textColor="@color/yp_black"
@@ -73,8 +76,9 @@
             android:layout_width="@dimen/primary_icon_size"
             android:layout_height="@dimen/primary_icon_size"
             android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="18dp"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_share" />
+            android:src="@drawable/ic_share_24" />
     </FrameLayout>
 
     <FrameLayout
@@ -85,6 +89,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/big_padding"
             android:includeFontPadding="false"
             android:text="@string/screen_settings_support_title"
             android:textColor="@color/yp_black"
@@ -94,8 +99,9 @@
             android:layout_width="@dimen/primary_icon_size"
             android:layout_height="@dimen/primary_icon_size"
             android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="18dp"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_support" />
+            android:src="@drawable/ic_support_24" />
     </FrameLayout>
 
     <FrameLayout
@@ -106,6 +112,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/big_padding"
             android:includeFontPadding="false"
             android:text="@string/screen_settings_user_agreement_title"
             android:textColor="@color/yp_black"
@@ -115,7 +122,8 @@
             android:layout_width="@dimen/primary_icon_size"
             android:layout_height="@dimen/primary_icon_size"
             android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="18dp"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_shevron" />
+            android:src="@drawable/ic_shevron_24" />
     </FrameLayout>
 </LinearLayout>
