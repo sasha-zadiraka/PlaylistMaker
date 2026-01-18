@@ -1,11 +1,24 @@
 <resources>
+    // main screen
     <string name="screen_main_title">Playlist Maker</string>
     <string name="screen_main_button_search_title">Поиск</string>
     <string name="screen_main_button_media_library">Медиатека</string>
     <string name="screen_main_button_settings">Настройки</string>
+
+    // settings screen
     <string name="screen_settings_title">Настройки</string>
     <string name="screen_settings_dark_theme_title">Темная тема</string>
     <string name="screen_settings_share_title">Поделиться приложением</string>
     <string name="screen_settings_support_title">Написать в поддержку</string>
     <string name="screen_settings_user_agreement_title">Пользовательское соглашение</string>
+    <string name="user_email_title">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
+    <string name="user_email_description">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+    <string name="user_email">alzadiraka@ya.ru</string>
+    <string name="course_link">https://practicum.yandex.kz/profile/android-developer-plus/</string>
+    <string name="user_agreement_link">https://yandex.ru/legal/practicum_offer/</string>
+
+    // search screen
+    <string name="screen_search_title">Поиск</string>
+    <string name="screen_search_input_hint">Поиск</string>
+
 </resources>
