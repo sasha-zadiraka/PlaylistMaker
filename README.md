@@ -31,7 +31,7 @@ Playlist Maker is an intuitive Android application that allows users to search f
 
 ## Screenshots
 
-> Add your app screenshots here to showcase the UI
+> TBD
 
 ## Tech Stack
 
