@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="ButtonStyleMainScreen" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_marginStart">@dimen/big_padding</item>
+        <item name="android:layout_marginEnd">@dimen/big_padding</item>
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">@dimen/primary_text_size</item>
+        <item name="android:textColor">@color/yp_black</item>
+        <item name="cornerRadius">@dimen/primary_corner_radius</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">@dimen/medium_padding</item>
+        <item name="iconTint">@color/yp_black</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:fontWeight">500</item>
+    </style>
+
+    <style name="SwitchStyleSettingsOptions">
+        <item name="thumbTint">@color/switch_thumb</item>
+        <item name="trackTint">@color/switch_track</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+    </style>
+
+    <style name="TextStyleSettingsOptions">
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:textSize">@dimen/secondary_text_size</item>
+        <item name="android:fontWeight">400</item>
+        <item name="android:layout_marginStart">@dimen/big_padding</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="IconStyleSettingsOptions">
+        <item name="android:layout_width">@dimen/primary_icon_size</item>
+        <item name="android:layout_height">@dimen/primary_icon_size</item>
+        <item name="android:layout_gravity">center_vertical|end</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:layout_marginEnd">@dimen/big_padding</item>
+    </style>
+</resources>

@@ -1,10 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SearchActivity">
+    android:orientation="vertical">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/button_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="4dp"
+            android:background="@null"
+            android:scaleType="center"
+            android:src="@drawable/ic_back_arrow_24"
+            app:tint="?attr/colorPrimary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/ys_display_medium"
+            android:text="@string/screen_search_title"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="@dimen/primary_text_size" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/search_input_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/big_padding"
+        android:layout_marginTop="@dimen/medium_padding"
+        android:layout_marginEnd="@dimen/big_padding">
+
+        <EditText
+            android:id="@+id/input_search"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_search_input"
+            android:drawableStart="@drawable/ic_search_magnifier_14"
+            android:drawablePadding="12dp"
+            android:drawableTint="?attr/colorOnPrimary"
+            android:fontFamily="@font/ys_display_regular"
+            android:gravity="center_vertical"
+            android:hint="@string/screen_search_input_hint"
+            android:includeFontPadding="false"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingStart="16dp"
+            android:paddingEnd="48dp"
+            android:textColor="@color/yp_black"
+            android:textColorHint="@color/yp_text_grey" />
+
+        <ImageView
+            android:id="@+id/clear_cross_icon"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="?attr/colorOnSecondaryContainer"
+            android:src="@drawable/ic_cross_button_16"
+            android:visibility="gone"
+            app:tint="?attr/colorOnPrimary" />
+    </FrameLayout>
+</LinearLayout>
