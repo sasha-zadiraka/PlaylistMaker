@@ -1,19 +1,14 @@
 package com.example.playlistmaker
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.doOnTextChanged
 
 class SearchActivity : AppCompatActivity() {
-    companion object {
-        private const val KEY_SEARCH_TEXT = "KEY_SEARCH_TEXT"
-    }
-
     private var searchText: String = ""
     private lateinit var inputEditText: EditText
     private lateinit var clearButton: ImageView
@@ -52,17 +47,14 @@ class SearchActivity : AppCompatActivity() {
             imm?.hideSoftInputFromWindow(inputEditText.windowToken, 0)
         }
 
-
-        val simpleTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                searchText = s?.toString().orEmpty()
-                clearButton.visibility = if (searchText.isEmpty()) View.GONE else View.VISIBLE
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
+        inputEditText.doOnTextChanged {
+                text: CharSequence?, _: Int, _: Int, _: Int ->
+            searchText = text?.toString().orEmpty()
+            clearButton.visibility = if (searchText.isEmpty()) View.GONE else View.VISIBLE
         }
-        inputEditText.addTextChangedListener(simpleTextWatcher)
+    }
+
+    companion object {
+        private const val KEY_SEARCH_TEXT = "KEY_SEARCH_TEXT"
     }
 }

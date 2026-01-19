@@ -12,5 +12,6 @@
         <!-- Customize your theme here. -->
         <item name="android:background">@color/yp_black</item>
         <item name="colorOnBackground">@color/yp_blue</item>
+        <item name="colorOnSecondaryContainer">@color/white</item>
     </style>
 </resources>
