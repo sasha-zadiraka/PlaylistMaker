@@ -13,5 +13,6 @@
         <item name="android:background">@color/yp_black</item>
         <item name="colorOnBackground">@color/yp_blue</item>
         <item name="colorOnSecondaryContainer">@color/white</item>
+        <item name="colorAccent">@color/white</item>
     </style>
 </resources>

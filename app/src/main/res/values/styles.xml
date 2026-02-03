@@ -44,4 +44,35 @@
         <item name="android:scaleType">centerInside</item>
         <item name="android:layout_marginEnd">@dimen/big_padding</item>
     </style>
+
+    <style name="TrackCoverShape">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">2dp</item>
+    </style>
+
+    <style name="TextStyleTrackCardTitle">
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:textSize">@dimen/secondary_text_size</item>
+        <item name="android:fontWeight">400</item>
+        <item name="android:layout_marginStart">@dimen/medium_padding</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="TextStyleTrackCardSubtitle">
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:textSize">@dimen/small_text_size</item>
+        <item name="android:fontWeight">400</item>
+        <item name="android:layout_marginStart">@dimen/medium_padding</item>
+        <item name="android:textColor">?attr/colorAccent</item>
+    </style>
+
+    <style name="IconStyleTrackCard">
+        <item name="android:layout_width">@dimen/primary_icon_size</item>
+        <item name="android:layout_height">@dimen/primary_icon_size</item>
+        <item name="android:layout_gravity">center_vertical|end</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:tint">?attr/colorAccent</item>
+    </style>
 </resources>

@@ -1,15 +1,22 @@
 package com.example.playlistmaker
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.LinearLayout
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 
 class SettingsActivity : AppCompatActivity() {
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_settings)
 
         val buttonBack = findViewById<ImageButton>(R.id.button_back)
@@ -45,6 +52,12 @@ class SettingsActivity : AppCompatActivity() {
                 getString(R.string.user_agreement_link).toUri())
 
             startActivity(userAgreementIntent)
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById<LinearLayout>(R.id.settings)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
         }
     }
 }
