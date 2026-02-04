@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="@dimen/medium_padding"
+    android:paddingEnd="12dp"
+    android:minHeight="61dp">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/trackCover"
+        android:layout_width="@dimen/cover_size"
+        android:layout_height="@dimen/cover_size"
+        android:scaleType="centerCrop"
+        app:shapeAppearance="@style/TrackCoverShape"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="@dimen/medium_padding"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/trackTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextStyleTrackCardTitle"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/trackArtist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextStyleTrackCardSubtitle"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+
+            <ImageView
+                android:id="@+id/dot"
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_dot_13"
+                app:tint="?attr/colorAccent" />
+
+            <TextView
+                android:id="@+id/trackTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextStyleTrackCardSubtitle"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageView
+        style="@style/IconStyleTrackCard"
+        android:src="@drawable/ic_shevron_24" />
+</LinearLayout>
