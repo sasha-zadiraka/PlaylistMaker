@@ -9,3 +9,5 @@
 local.properties
 app/build
 build
+.idea/gradle.xml
+.idea/misc.xml
