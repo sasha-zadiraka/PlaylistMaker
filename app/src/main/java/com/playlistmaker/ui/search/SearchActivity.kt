@@ -3,10 +3,14 @@ package com.playlistmaker.ui.search
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -15,13 +19,35 @@ import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
+import com.playlistmaker.api.ItunesApi
+import com.playlistmaker.api.mapper.toTrack
+import com.playlistmaker.api.response.ItunesSearchResponse
 import com.playlistmaker.model.Track
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : AppCompatActivity() {
     private var searchText: String = ""
     private lateinit var inputEditText: EditText
-    private lateinit var clearButton: ImageView
+    private lateinit var buttonClear: ImageView
     private lateinit var recycler: RecyclerView
+    private lateinit var placeholderMessage: TextView
+    private lateinit var trackAdapter: TrackAdapter
+    private lateinit var buttonRetry: Button
+    private var lastSearchQuery: String? = null
+
+    private val itunesBaseUrl = "https://itunes.apple.com/"
+    private val retrofit = Retrofit.Builder()
+        .baseUrl(itunesBaseUrl)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    private val itunesService = retrofit.create(ItunesApi::class.java)
+
+    private val trackList = ArrayList<Track>()
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -33,7 +59,7 @@ class SearchActivity : AppCompatActivity() {
         val restoredText = savedInstanceState.getString(KEY_SEARCH_TEXT, "")
         inputEditText.setText(restoredText)
         inputEditText.setSelection(restoredText.length)
-        clearButton.visibility = if (restoredText.isEmpty()) View.GONE else View.VISIBLE
+        buttonClear.visibility = if (restoredText.isEmpty()) View.GONE else View.VISIBLE
         searchText = restoredText
     }
 
@@ -45,31 +71,56 @@ class SearchActivity : AppCompatActivity() {
 
         val buttonBack = findViewById<ImageButton>(R.id.button_back)
         inputEditText = findViewById(R.id.input_search)
-        clearButton = findViewById(R.id.clear_cross_icon)
+        buttonClear = findViewById(R.id.clear_cross_icon)
         recycler = findViewById(R.id.tracksRecycler)
-
-        val tracks = createMockedTracks()
+        placeholderMessage = findViewById(R.id.placeholderMessage)
+        buttonRetry = findViewById(R.id.buttonRetry)
 
         buttonBack.setOnClickListener {
             finish()
         }
 
-        clearButton.setOnClickListener {
+        buttonRetry.setOnClickListener {
+            lastSearchQuery?.let { search(it) }
+        }
+
+        buttonClear.setOnClickListener {
             inputEditText.setText("")
             inputEditText.clearFocus()
 
             val imm = getSystemService(android.view.inputmethod.InputMethodManager::class.java)
             imm?.hideSoftInputFromWindow(inputEditText.windowToken, 0)
+
+            buttonClear.visibility = View.GONE
+
+            trackList.clear()
+            trackAdapter.notifyDataSetChanged()
+            recycler.visibility = View.GONE
+
+            showMessage(null, "")
         }
 
-        inputEditText.doOnTextChanged {
-                text: CharSequence?, _: Int, _: Int, _: Int ->
+        inputEditText.doOnTextChanged { text: CharSequence?, _: Int, _: Int, _: Int ->
             searchText = text?.toString().orEmpty()
-            clearButton.visibility = if (searchText.isEmpty()) View.GONE else View.VISIBLE
+            buttonClear.visibility = if (searchText.isEmpty()) View.GONE else View.VISIBLE
         }
 
+        inputEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                search()
+                inputEditText.clearFocus()
+                val imm = getSystemService(InputMethodManager::class.java)
+                imm?.hideSoftInputFromWindow(inputEditText.windowToken, 0)
+
+                true
+            } else {
+                false
+            }
+        }
+
+        trackAdapter = TrackAdapter(trackList)
         recycler.layoutManager = LinearLayoutManager(this)
-        recycler.adapter = TrackAdapter(tracks)
+        recycler.adapter = trackAdapter
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById<LinearLayout>(R.id.search)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -78,40 +129,84 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    enum class SearchState {
+        EMPTY,
+        ERROR
+    }
+
     companion object {
         private const val KEY_SEARCH_TEXT = "KEY_SEARCH_TEXT"
     }
 
-    private fun createMockedTracks(): ArrayList<Track> = arrayListOf(
-        Track(
-            trackName = "Smells Like Teen Spirit",
-            artistName = "Nirvana",
-            trackTime = "5:01",
-            artworkUrl100 = "https://is5-ssl.mzstatic.com/image/thumb/Music115/v4/7b/58/c2/7b58c21a-2b51-2bb2-e59a-9bb9b96ad8c3/00602567924166.rgb.jpg/100x100bb.jpg"
-        ),
-        Track(
-            trackName = "Billie Jean",
-            artistName = "Michael Jackson",
-            trackTime = "4:35",
-            artworkUrl100 = "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/3d/9d/38/3d9d3811-71f0-3a0e-1ada-3004e56ff852/827969428726.jpg/100x100bb.jpg"
-        ),
-        Track(
-            trackName = "Stayin' Alive",
-            artistName = "Bee Gees",
-            trackTime = "4:10",
-            artworkUrl100 = "https://is4-ssl.mzstatic.com/image/thumb/Music115/v4/1f/80/1f/1f801fc1-8c0f-ea3e-d3e5-387c6619619e/16UMGIM86640.rgb.jpg/100x100bb.jpg"
-        ),
-        Track(
-            trackName = "Whole Lotta Love",
-            artistName = "Led Zeppelin",
-            trackTime = "5:33",
-            artworkUrl100 = "https://is2-ssl.mzstatic.com/image/thumb/Music62/v4/7e/17/e3/7e17e33f-2efa-2a36-e916-7f808576cf6b/mzm.fyigqcbs.jpg/100x100bb.jpg"
-        ),
-        Track(
-            trackName = "Sweet Child O'Mine",
-            artistName = "Guns N' Roses",
-            trackTime = "5:03",
-            artworkUrl100 = "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/100x100bb.jpg"
-        )
-    )
+    private fun search(query: String) {
+        val trimmed = query.trim()
+        if (trimmed.isEmpty()) return
+
+        lastSearchQuery = trimmed
+
+        itunesService.search(trimmed)
+            .enqueue(object : Callback<ItunesSearchResponse> {
+                override fun onResponse(
+                    call: Call<ItunesSearchResponse>,
+                    response: Response<ItunesSearchResponse>
+                ) {
+                    val body = response.body()
+
+                    if (response.isSuccessful && body != null) {
+                        val tracks = body.results.map { it.toTrack() }
+
+                        if (tracks.isNotEmpty()) {
+                            trackList.clear()
+                            trackList.addAll(tracks)
+                            trackAdapter.notifyDataSetChanged()
+                            recycler.visibility = View.VISIBLE
+                            showMessage(null, "")
+                        } else {
+                            recycler.visibility = View.GONE
+                            showMessage(SearchState.EMPTY, getString(R.string.screen_search_error_empty_response))
+                        }
+                    } else {
+                        recycler.visibility = View.GONE
+                        showMessage(SearchState.ERROR, getString(R.string.screen_search_error_no_internet))
+                    }
+                }
+
+                override fun onFailure(call: Call<ItunesSearchResponse>, t: Throwable) {
+                    showMessage(SearchState.ERROR, getString(R.string.screen_search_error_no_internet))
+                }
+            })
+    }
+
+    private fun search() {
+        search(inputEditText.text.toString())
+    }
+
+    private fun showMessage(state: SearchState?, text: String) {
+        val errorImage = findViewById<ImageView>(R.id.errorImage)
+
+        if (state == null) {
+            placeholderMessage.visibility = View.GONE
+            errorImage.visibility = View.GONE
+            buttonRetry.visibility = View.GONE
+            return
+        }
+
+        placeholderMessage.visibility = View.VISIBLE
+        placeholderMessage.text = text
+        errorImage.visibility = View.VISIBLE
+
+        when (state) {
+            SearchState.EMPTY -> {
+                errorImage.setImageResource(R.drawable.ic_empty_track_list_120)
+                buttonRetry.visibility = View.GONE
+            }
+            SearchState.ERROR -> {
+                errorImage.setImageResource(R.drawable.ic_no_internet_120)
+                buttonRetry.visibility = View.VISIBLE
+            }
+        }
+
+        trackList.clear()
+        trackAdapter.notifyDataSetChanged()
+    }
 }

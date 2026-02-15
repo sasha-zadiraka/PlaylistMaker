@@ -10,9 +10,12 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/white</item>
         <!-- Customize your theme here. -->
+        <item name="colorOnPrimaryFixed">@color/white</item>
         <item name="android:background">@color/white</item>
         <item name="colorOnBackground">@color/green</item>
         <item name="colorOnSecondaryContainer">@color/yp_light_grey</item>
         <item name="colorAccent">@color/yp_text_grey</item>
+        <item name="colorControlActivated">@color/yp_black</item>
+        <item name="android:textColorHighlight">@android:color/transparent</item>
     </style>
 </resources>

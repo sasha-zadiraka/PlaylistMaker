@@ -20,5 +20,7 @@
     // search screen
     <string name="screen_search_title">Поиск</string>
     <string name="screen_search_input_hint">Поиск</string>
-
+    <string name="screen_search_error_empty_response">Ничего не нашлось</string>
+    <string name="screen_search_error_no_internet">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="screen_search_button_reload">Обновить</string>
 </resources>
