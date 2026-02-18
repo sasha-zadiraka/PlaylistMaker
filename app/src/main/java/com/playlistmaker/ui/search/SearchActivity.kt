@@ -20,8 +20,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.playlistmaker.api.ItunesApi
+import com.playlistmaker.data.AppConstants.ITUNES_BASE_URL
 import com.playlistmaker.api.mapper.toTrack
 import com.playlistmaker.api.response.ItunesSearchResponse
+import com.playlistmaker.data.AppConstants.KEY_SEARCH_TEXT
 import com.playlistmaker.model.Track
 import retrofit2.Call
 import retrofit2.Callback
@@ -39,15 +41,14 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var buttonRetry: Button
     private var lastSearchQuery: String? = null
 
-    private val itunesBaseUrl = "https://itunes.apple.com/"
     private val retrofit = Retrofit.Builder()
-        .baseUrl(itunesBaseUrl)
+        .baseUrl(ITUNES_BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
     private val itunesService = retrofit.create(ItunesApi::class.java)
 
-    private val trackList = ArrayList<Track>()
+    private val trackList = mutableListOf<Track>()
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -132,10 +133,6 @@ class SearchActivity : AppCompatActivity() {
     enum class SearchState {
         EMPTY,
         ERROR
-    }
-
-    companion object {
-        private const val KEY_SEARCH_TEXT = "KEY_SEARCH_TEXT"
     }
 
     private fun search(query: String) {
