@@ -23,4 +23,6 @@
     <string name="screen_search_error_empty_response">Ничего не нашлось</string>
     <string name="screen_search_error_no_internet">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
     <string name="screen_search_button_reload">Обновить</string>
+    <string name="screen_search_history_title">Вы искали</string>
+    <string name="screen_search_button_clean_history">Очистить историю</string>
 </resources>

@@ -17,7 +17,7 @@ class TrackViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
     private val artistName: TextView = itemView.findViewById(R.id.trackArtist)
     private val trackTime: TextView = itemView.findViewById(R.id.trackTime)
 
-    fun bind(model: Track) {
+    fun bind(model: Track, onTrackClick: (Track) -> Unit) {
         trackName.text = model.trackName
         artistName.text = model.artistName
         trackTime.text = model.trackTime
@@ -28,5 +28,9 @@ class TrackViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
             .error(R.drawable.ic_cover_placeholder_45)
             .centerCrop()
             .into(cover)
+
+        itemView.setOnClickListener {
+            onTrackClick(model)
+        }
     }
 }

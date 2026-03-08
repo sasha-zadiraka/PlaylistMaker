@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.switchmaterial.SwitchMaterial
+import com.playlistmaker.App
 
 class SettingsActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
@@ -23,9 +25,16 @@ class SettingsActivity : AppCompatActivity() {
         val buttonShareApp = findViewById<FrameLayout>(R.id.button_share_app)
         val buttonContactSupport = findViewById<FrameLayout>(R.id.button_support)
         val buttonUserAgreement = findViewById<FrameLayout>(R.id.button_user_agreement)
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.themeSwitcher)
 
         buttonBack.setOnClickListener {
             finish()
+        }
+
+        val app = application as App
+        themeSwitcher.isChecked = app.darkTheme
+        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
         }
 
         buttonShareApp.setOnClickListener{
