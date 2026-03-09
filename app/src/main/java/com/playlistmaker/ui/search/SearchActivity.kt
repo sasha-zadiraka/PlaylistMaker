@@ -75,7 +75,7 @@ class SearchActivity : AppCompatActivity() {
         val restoredText = savedInstanceState.getString(KEY_SEARCH_TEXT, "")
         inputEditText.setText(restoredText)
         inputEditText.setSelection(restoredText.length)
-        clearButton.visibility = if (restoredText.isEmpty()) View.GONE else View.VISIBLE
+        buttonClear.visibility = if (restoredText.isEmpty()) View.GONE else View.VISIBLE
         searchText = restoredText
     }
 
@@ -136,7 +136,7 @@ class SearchActivity : AppCompatActivity() {
             finish()
         }
 
-        clearButton.setOnClickListener {
+        buttonClear.setOnClickListener {
             inputEditText.setText("")
             inputEditText.requestFocus()
 
@@ -198,6 +198,11 @@ class SearchActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    enum class SearchState {
+        EMPTY,
+        ERROR
     }
 
     companion object {
