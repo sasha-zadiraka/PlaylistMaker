@@ -17,13 +17,16 @@
             android:name="com.playlistmaker.ui.search.SearchActivity"
             android:exported="false" />
         <activity
-            android:name=".MediaLibraryActivity"
+            android:name="com.playlistmaker.ui.MediaLibraryActivity"
             android:exported="false" />
         <activity
-            android:name=".SettingsActivity"
+            android:name="com.playlistmaker.ui.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name="com.playlistmaker.ui.PlayerActivity"
+            android:exported="false"/>
+        <activity
+            android:name="com.playlistmaker.ui.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

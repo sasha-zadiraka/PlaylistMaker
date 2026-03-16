@@ -7,4 +7,6 @@ object AppConstants {
 
     const val PREFS_NAME = "app_settings"
     const val APP_DARK_THEME = "dark_theme"
+
+    const val TRACK_KEY = "track_key"
 }
