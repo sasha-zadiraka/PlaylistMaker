@@ -25,4 +25,11 @@
     <string name="screen_search_button_reload">Обновить</string>
     <string name="screen_search_history_title">Вы искали</string>
     <string name="screen_search_button_clean_history">Очистить историю</string>
+
+    // player screen
+    <string name="screen_player_track_length">Длительность</string>
+    <string name="screen_player_track_album">Альбом</string>
+    <string name="screen_player_track_year">Год</string>
+    <string name="screen_player_track_genre">Жанр</string>
+    <string name="screen_player_track_country">Страна</string>
 </resources>

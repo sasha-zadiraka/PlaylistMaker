@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.playlistmaker.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.playlistmaker.R
 import com.playlistmaker.ui.search.SearchActivity
 
 class MainActivity : AppCompatActivity() {

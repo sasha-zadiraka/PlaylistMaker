@@ -61,6 +61,20 @@
         <item name="android:textColor">?attr/colorAccent</item>
     </style>
 
+    <style name="PlayerMetaLabel">
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textColor">@color/yp_text_grey</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:fontWeight">400</item>
+    </style>
+
+    <style name="PlayerMetaValue">
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:fontWeight">400</item>
+    </style>
+
     <style name="IconStyleTrackCard">
         <item name="android:layout_width">@dimen/primary_icon_size</item>
         <item name="android:layout_height">@dimen/primary_icon_size</item>

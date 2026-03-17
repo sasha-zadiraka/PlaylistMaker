@@ -2,6 +2,7 @@ package com.playlistmaker.ui.search
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -26,7 +27,9 @@ import com.playlistmaker.api.mapper.toTrack
 import com.playlistmaker.api.response.ItunesSearchResponse
 import com.playlistmaker.data.AppConstants.ITUNES_BASE_URL
 import com.playlistmaker.data.AppConstants.KEY_SEARCH_TEXT
+import com.playlistmaker.data.AppConstants.TRACK_KEY
 import com.playlistmaker.model.Track
+import com.playlistmaker.ui.PlayerActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -115,11 +118,19 @@ class SearchActivity : AppCompatActivity() {
     private fun initAdapters() {
         trackAdapter = TrackAdapter(trackList) { track ->
             searchHistory.addTrack(track)
+
+            val intent = Intent(this, PlayerActivity::class.java)
+            intent.putExtra(TRACK_KEY, track)
+            startActivity(intent)
         }
 
         historyAdapter = TrackAdapter(historyTrackList) { track ->
             searchHistory.addTrack(track)
             showHistoryIfNeeded()
+
+            val intent = Intent(this, PlayerActivity::class.java)
+            intent.putExtra(TRACK_KEY, track)
+            startActivity(intent)
         }
 
         recycler.layoutManager = LinearLayoutManager(this)
@@ -203,10 +214,6 @@ class SearchActivity : AppCompatActivity() {
     enum class SearchState {
         EMPTY,
         ERROR
-    }
-
-    companion object {
-        private const val KEY_SEARCH_TEXT = "KEY_SEARCH_TEXT"
     }
 
     private fun search(query: String) {
