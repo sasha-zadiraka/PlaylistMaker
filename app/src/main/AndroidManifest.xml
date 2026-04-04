@@ -23,7 +23,7 @@
             android:name="com.playlistmaker.ui.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name="com.playlistmaker.ui.PlayerActivity"
+            android:name="com.playlistmaker.ui.player.PlayerActivity"
             android:exported="false"/>
         <activity
             android:name="com.playlistmaker.ui.MainActivity"
