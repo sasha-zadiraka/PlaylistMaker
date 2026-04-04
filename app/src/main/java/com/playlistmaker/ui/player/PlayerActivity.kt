@@ -1,4 +1,4 @@
-package com.playlistmaker.ui
+package com.playlistmaker.ui.player
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -7,7 +7,11 @@ import android.os.Looper
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
@@ -37,13 +41,6 @@ class PlayerActivity : AppCompatActivity() {
 
     private var mediaPlayer: MediaPlayer? = null
 
-    private enum class PlayerState {
-        DEFAULT,
-        PREPARED,
-        PLAYING,
-        PAUSED
-    }
-
     private var playerState = PlayerState.DEFAULT
 
     private val handler = Handler(Looper.getMainLooper())
@@ -62,6 +59,7 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_player)
 
         initViews()
@@ -78,6 +76,12 @@ class PlayerActivity : AppCompatActivity() {
 
         buttonPlay.setOnClickListener {
             playbackControl()
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById<ConstraintLayout>(R.id.playerRoot)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
         }
     }
 

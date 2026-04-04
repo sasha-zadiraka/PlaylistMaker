@@ -33,7 +33,7 @@ import com.playlistmaker.data.AppConstants.KEY_SEARCH_TEXT
 import com.playlistmaker.data.AppConstants.SEARCH_DEBOUNCE_DELAY
 import com.playlistmaker.data.AppConstants.TRACK_KEY
 import com.playlistmaker.model.Track
-import com.playlistmaker.ui.PlayerActivity
+import com.playlistmaker.ui.player.PlayerActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -104,9 +104,13 @@ class SearchActivity : AppCompatActivity() {
         initSearchHistory()
         initAdapters()
         setupListeners()
-        setupInsets()
-
         showHistoryIfNeeded()
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById<LinearLayout>(R.id.search)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
     }
 
     private fun initViews() {
@@ -229,14 +233,6 @@ class SearchActivity : AppCompatActivity() {
             historyTrackList.clear()
             historyAdapter.notifyDataSetChanged()
             hideHistory()
-        }
-    }
-
-    private fun setupInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById<LinearLayout>(R.id.search)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
         }
     }
 
