@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -26,7 +28,7 @@ import com.playlistmaker.api.ItunesApi
 import com.playlistmaker.api.mapper.toTrack
 import com.playlistmaker.api.response.ItunesSearchResponse
 import com.playlistmaker.data.AppConstants.ITUNES_BASE_URL
-import com.playlistmaker.data.AppConstants.KEY_SEARCH_TEXT
+import com.playlistmaker.data.AppConstants.SEARCH_HISTORY_KEY
 import com.playlistmaker.data.AppConstants.TRACK_KEY
 import com.playlistmaker.model.Track
 import com.playlistmaker.ui.PlayerActivity
@@ -68,14 +70,18 @@ class SearchActivity : AppCompatActivity() {
 
     private val itunesService = retrofit.create(ItunesApi::class.java)
 
+    private var isClickAllowed = true
+
+    private val handler = Handler(Looper.getMainLooper())
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(KEY_SEARCH_TEXT, searchText)
+        outState.putString(SEARCH_HISTORY_KEY, searchText)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        val restoredText = savedInstanceState.getString(KEY_SEARCH_TEXT, "")
+        val restoredText = savedInstanceState.getString(SEARCH_HISTORY_KEY, "")
         inputEditText.setText(restoredText)
         inputEditText.setSelection(restoredText.length)
         buttonClear.visibility = if (restoredText.isEmpty()) View.GONE else View.VISIBLE

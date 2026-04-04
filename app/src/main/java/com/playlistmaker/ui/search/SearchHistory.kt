@@ -5,16 +5,13 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.playlistmaker.model.Track
 import androidx.core.content.edit
+import com.playlistmaker.data.AppConstants.MAX_HISTORY_SIZE
+import com.playlistmaker.data.AppConstants.SEARCH_HISTORY_KEY
 
 class SearchHistory(
     private val sharedPreferences: SharedPreferences,
     private val gson: Gson
 ) {
-    companion object {
-        private const val SEARCH_HISTORY_KEY = "search_history"
-        private const val MAX_HISTORY_SIZE = 10
-    }
-
     fun addTrack(track: Track) {
         val history = getHistory().toMutableList()
 
