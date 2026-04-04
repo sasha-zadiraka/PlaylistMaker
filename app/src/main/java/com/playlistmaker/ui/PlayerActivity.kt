@@ -1,6 +1,9 @@
 package com.playlistmaker.ui
 
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -9,12 +12,16 @@ import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.playlistmaker.data.AppConstants.TRACK_KEY
+import com.playlistmaker.data.AppConstants.ZERO_TIME
 import com.playlistmaker.model.Track
 import com.playlistmaker.model.getCoverArtwork
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
 
     private lateinit var buttonBack: ImageButton
+    private lateinit var buttonPlay: ImageButton
     private lateinit var coverArtwork: ImageView
     private lateinit var trackName: TextView
     private lateinit var artistName: TextView
@@ -28,6 +35,31 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var albumLabel: TextView
     private lateinit var yearLabel: TextView
 
+    private var mediaPlayer: MediaPlayer? = null
+
+    private enum class PlayerState {
+        DEFAULT,
+        PREPARED,
+        PLAYING,
+        PAUSED
+    }
+
+    private var playerState = PlayerState.DEFAULT
+
+    private val handler = Handler(Looper.getMainLooper())
+
+    private val progressRunnable = object : Runnable {
+        override fun run() {
+            if (playerState == PlayerState.PLAYING) {
+                progressValue.text = SimpleDateFormat(
+                    "mm:ss",
+                    Locale.getDefault()
+                ).format(mediaPlayer?.currentPosition ?: 0)
+                handler.postDelayed(this, 300L)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
@@ -38,13 +70,20 @@ class PlayerActivity : AppCompatActivity() {
             finish()
         }
 
-        (intent.getSerializableExtra(TRACK_KEY) as? Track)?.let {
+        val track = intent.getSerializableExtra(TRACK_KEY) as? Track
+        track?.let {
             fillData(it)
+            preparePlayer(it.previewUrl)
+        }
+
+        buttonPlay.setOnClickListener {
+            playbackControl()
         }
     }
 
     private fun initViews() {
         buttonBack = findViewById(R.id.buttonBack)
+        buttonPlay = findViewById(R.id.buttonPlay)
         coverArtwork = findViewById(R.id.coverArtwork)
         trackName = findViewById(R.id.trackName)
         artistName = findViewById(R.id.artistName)
@@ -62,7 +101,7 @@ class PlayerActivity : AppCompatActivity() {
     private fun fillData(track: Track) {
         trackName.text = track.trackName
         artistName.text = track.artistName
-        progressValue.text = "00:00"
+        progressValue.text = ZERO_TIME
         durationValue.text = track.trackTime
         genreValue.text = track.primaryGenreName
         countryValue.text = track.country
@@ -81,5 +120,64 @@ class PlayerActivity : AppCompatActivity() {
             .error(R.drawable.ic_cover_placeholder_233)
             .centerCrop()
             .into(coverArtwork)
+    }
+
+    private fun preparePlayer(url: String) {
+        mediaPlayer = MediaPlayer().apply {
+            setDataSource(url)
+            prepareAsync()
+            setOnPreparedListener {
+                playerState = PlayerState.PREPARED
+                setPlayButtonIcon()
+            }
+            setOnCompletionListener {
+                playerState = PlayerState.PREPARED
+                progressValue.text = ZERO_TIME
+                handler.removeCallbacks(progressRunnable)
+                setPlayButtonIcon()
+            }
+        }
+    }
+
+    private fun playbackControl() {
+        when (playerState) {
+            PlayerState.PREPARED, PlayerState.PAUSED -> startPlayer()
+            else -> pausePlayer()
+        }
+    }
+
+    private fun startPlayer() {
+        mediaPlayer?.start()
+        playerState = PlayerState.PLAYING
+        setPlayButtonIcon()
+        handler.post(progressRunnable)
+    }
+
+    private fun pausePlayer() {
+        mediaPlayer?.pause()
+        playerState = PlayerState.PAUSED
+        setPlayButtonIcon()
+        handler.removeCallbacks(progressRunnable)
+    }
+
+    private fun setPlayButtonIcon() {
+        when (playerState) {
+            PlayerState.PLAYING -> buttonPlay.setImageResource(R.drawable.ic_pause_83)
+            else -> buttonPlay.setImageResource(R.drawable.ic_play_83)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (playerState == PlayerState.PLAYING) {
+            pausePlayer()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacks(progressRunnable)
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 }

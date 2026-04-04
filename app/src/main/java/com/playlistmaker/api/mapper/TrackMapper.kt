@@ -20,6 +20,7 @@ fun TrackDto.toTrack(): Track {
         collectionName = collectionName.orEmpty(),
         releaseDate = formattedReleaseYear,
         primaryGenreName = primaryGenreName.orEmpty(),
-        country = country.orEmpty()
+        country = country.orEmpty(),
+        previewUrl = previewUrl.orEmpty()
     )
 }

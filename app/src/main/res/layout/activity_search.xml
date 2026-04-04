@@ -80,6 +80,16 @@
         android:gravity="center"
         android:orientation="vertical">
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_gravity="center_horizontal"
+            android:indeterminate="true"
+            android:indeterminateTint="#3772E7"
+            android:layout_marginTop="140dp"
+            android:visibility="gone" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/tracksRecycler"
             android:layout_width="match_parent"
@@ -101,6 +111,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/big_padding"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
             android:fontFamily="@font/ys_display_medium"
             android:gravity="center"
             android:textAlignment="center"
