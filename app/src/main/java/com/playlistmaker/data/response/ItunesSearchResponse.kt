@@ -1,7 +1,7 @@
-package com.playlistmaker.api.response
+package com.playlistmaker.data.response
 
 import com.google.gson.annotations.SerializedName
-import com.playlistmaker.api.dto.TrackDto
+import com.playlistmaker.data.dto.TrackDto
 
 data class ItunesSearchResponse(
     @SerializedName("resultCount") val resultCount: Int,

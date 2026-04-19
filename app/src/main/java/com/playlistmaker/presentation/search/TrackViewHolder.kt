@@ -1,4 +1,4 @@
-package com.playlistmaker.ui.search
+package com.playlistmaker.presentation.search
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
-import com.playlistmaker.model.Track
+import com.playlistmaker.domain.models.Track
 
 class TrackViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.track_card, parent, false)

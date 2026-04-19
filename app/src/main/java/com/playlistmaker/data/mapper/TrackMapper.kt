@@ -1,12 +1,12 @@
-package com.playlistmaker.api.mapper
+package com.playlistmaker.data.mapper
 
-import com.playlistmaker.api.dto.TrackDto
-import com.playlistmaker.model.Track
+import com.playlistmaker.data.dto.TrackDto
+import com.playlistmaker.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 fun TrackDto.toTrack(): Track {
-    val formattedTrackLength = SimpleDateFormat("mm:ss", Locale.getDefault())
+    val formattedTrackTime = SimpleDateFormat("mm:ss", Locale.getDefault())
         .format(trackTimeMillis ?: 0L)
 
     val formattedReleaseYear = releaseDate?.take(4) ?: ""
@@ -15,7 +15,7 @@ fun TrackDto.toTrack(): Track {
         trackId = trackId ?: 0,
         trackName = trackName.orEmpty(),
         artistName = artistName.orEmpty(),
-        trackTime = formattedTrackLength,
+        trackTime = formattedTrackTime,
         artworkUrl100 = artworkUrl100.orEmpty(),
         collectionName = collectionName.orEmpty(),
         releaseDate = formattedReleaseYear,

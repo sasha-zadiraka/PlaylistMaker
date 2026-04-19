@@ -1,8 +1,8 @@
-package com.playlistmaker.ui.search
+package com.playlistmaker.presentation.search
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.playlistmaker.model.Track
+import com.playlistmaker.domain.models.Track
 
 class TrackAdapter(
     private val tracks: List<Track>,

@@ -1,6 +1,6 @@
-package com.playlistmaker.api
+package com.playlistmaker.data.network
 
-import com.playlistmaker.api.response.ItunesSearchResponse
+import com.playlistmaker.data.response.ItunesSearchResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query

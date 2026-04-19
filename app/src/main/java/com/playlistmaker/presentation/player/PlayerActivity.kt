@@ -1,4 +1,4 @@
-package com.playlistmaker.ui.player
+package com.playlistmaker.presentation.player
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -40,7 +40,6 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var yearLabel: TextView
 
     private var mediaPlayer: MediaPlayer? = null
-
     private var playerState = PlayerState.DEFAULT
 
     private val handler = Handler(Looper.getMainLooper())
@@ -97,7 +96,6 @@ class PlayerActivity : AppCompatActivity() {
         yearValue = findViewById(R.id.yearValue)
         genreValue = findViewById(R.id.genreValue)
         countryValue = findViewById(R.id.countryValue)
-
         albumLabel = findViewById(R.id.albumLabel)
         yearLabel = findViewById(R.id.yearLabel)
     }

@@ -1,20 +1,21 @@
-package com.playlistmaker.ui.search
+package com.playlistmaker.data.repository
 
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.playlistmaker.model.Track
-import androidx.core.content.edit
 import com.playlistmaker.data.AppConstants.MAX_HISTORY_SIZE
 import com.playlistmaker.data.AppConstants.SEARCH_HISTORY_KEY
+import com.playlistmaker.domain.models.Track
+import com.playlistmaker.domain.repository.SearchHistoryRepository
 
-class SearchHistory(
+class SearchHistoryRepositoryImpl(
     private val sharedPreferences: SharedPreferences,
     private val gson: Gson
-) {
-    fun addTrack(track: Track) {
-        val history = getHistory().toMutableList()
+) : SearchHistoryRepository {
 
+    override fun addTrack(track: Track) {
+        val history = getHistory().toMutableList()
         history.removeAll { it.trackId == track.trackId }
         history.add(0, track)
 
@@ -25,13 +26,13 @@ class SearchHistory(
         saveHistory(history)
     }
 
-    fun getHistory(): List<Track> {
+    override fun getHistory(): List<Track> {
         val json = sharedPreferences.getString(SEARCH_HISTORY_KEY, null) ?: return emptyList()
         val type = object : TypeToken<ArrayList<Track>>() {}.type
         return gson.fromJson<ArrayList<Track>>(json, type) ?: emptyList()
     }
 
-    fun clearHistory() {
+    override fun clearHistory() {
         sharedPreferences.edit {
             remove(SEARCH_HISTORY_KEY)
         }
