@@ -17,17 +17,18 @@
 
 ## About
 
-Playlist Maker is an intuitive Android application that allows users to search for music, create custom playlists, and manage their media library. Built with modern Android development practices and Material Design principles.
+Playlist Maker is an Android application for searching tracks, previewing audio, and managing a growing music experience. The project is being developed step by step using modern Android practices and Clean Architecture principles.
 
 ## Features
 
-- **Smart Search** - Find your favorite tracks quickly and easily
-- **Media Library** - Organize and manage your music collection
-- **Dark Theme** - Easy on the eyes with beautiful dark mode support
-- **Customizable Settings** - Personalize your experience
-- **Share** - Share the app with friends
-- **Support** - Easy access to support and help
-- **User Agreement** - Transparent terms and conditions
+- **Track Search** — Search for music tracks via the iTunes Search API
+- **Search History** — Quickly return to recently opened tracks
+- **Audio Player** — Listen to 30-second track previews
+- **Media Library** — Screen prepared for further playlist and library features
+- **Dark Theme** — Toggle dark mode in settings
+- **Share App** — Share the app link with others
+- **Support** — Contact support directly from the app
+- **User Agreement** — Open the agreement page from settings
 
 ## Screenshots
 
@@ -38,7 +39,11 @@ Playlist Maker is an intuitive Android application that allows users to search f
 - **Language:** Kotlin
 - **Min SDK:** 29 (Android 10)
 - **Target SDK:** 36
-- **Architecture:** MVVM (planned)
+- **Architecture:** Clean Architecture (Data / Domain / Presentation)
+- **Networking:** Retrofit + Gson Converter
+- **Image Loading:** Glide
+- **Storage:** SharedPreferences
+- **Audio Playback:** MediaPlayer
 - **UI:** Material Design Components
 - **Build System:** Gradle (Kotlin DSL)
 
@@ -87,11 +92,12 @@ Playlist Maker/
 ├── app/
 │   ├── src/
 │   │   ├── main/
-│   │   │   ├── java/com/example/playlistmaker/
-│   │   │   │   ├── MainActivity.kt
-│   │   │   │   ├── SearchActivity.kt
-│   │   │   │   ├── MediaLibraryActivity.kt
-│   │   │   │   └── SettingsActivity.kt
+│   │   │   ├── java/com/playlistmaker/
+│   │   │   │   ├── data/           # Data layer (network, storage, repositories)
+│   │   │   │   ├── domain/         # Domain layer (models, interactors, interfaces)
+│   │   │   │   ├── presentation/   # UI layer (activities, adapters)
+│   │   │   │   ├── App.kt
+│   │   │   │   └── Creator.kt
 │   │   │   ├── res/
 │   │   │   └── AndroidManifest.xml
 │   │   └── build.gradle.kts
