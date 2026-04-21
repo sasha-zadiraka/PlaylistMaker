@@ -1,6 +1,6 @@
 package com.playlistmaker.domain.impl
 
-import com.playlistmaker.data.sharing.ExternalNavigator
+import com.playlistmaker.domain.api.ExternalNavigator
 import com.playlistmaker.domain.api.SharingInteractor
 import com.playlistmaker.domain.models.EmailData
 import com.playlistmaker.domain.models.SharingData

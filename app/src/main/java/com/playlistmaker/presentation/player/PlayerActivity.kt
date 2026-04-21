@@ -15,6 +15,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
+import com.playlistmaker.data.AppConstants.PLAYER_PROGRESS_UPDATE_DELAY
 import com.playlistmaker.data.AppConstants.TRACK_KEY
 import com.playlistmaker.data.AppConstants.ZERO_TIME
 import com.playlistmaker.domain.models.Track
@@ -51,7 +52,7 @@ class PlayerActivity : AppCompatActivity() {
                     "mm:ss",
                     Locale.getDefault()
                 ).format(mediaPlayer?.currentPosition ?: 0)
-                handler.postDelayed(this, 300L)
+                handler.postDelayed(this, PLAYER_PROGRESS_UPDATE_DELAY)
             }
         }
     }

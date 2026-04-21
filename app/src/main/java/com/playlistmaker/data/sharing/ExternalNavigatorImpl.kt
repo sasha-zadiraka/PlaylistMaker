@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import com.playlistmaker.domain.models.EmailData
 import androidx.core.net.toUri
+import com.playlistmaker.domain.api.ExternalNavigator
 
 class ExternalNavigatorImpl(
     private val context: Context
