@@ -19,4 +19,5 @@ object AppConstants {
 
     // Player constants
     const val ZERO_TIME = "00:00"
+    const val PLAYER_PROGRESS_UPDATE_DELAY = 300L
 }
