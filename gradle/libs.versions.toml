@@ -12,6 +12,7 @@ constraintlayout = "2.2.1"
 glide = "5.0.5"
 retrofit = "2.11.0"
 okhttp = "4.12.0"
+moxy = "2.2.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -26,8 +27,10 @@ glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "gl
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+moxy = { module = "com.github.moxy-community:moxy", version.ref = "moxy" }
+moxy-android = { module = "com.github.moxy-community:moxy-android", version.ref = "moxy" }
+moxy-compiler = { module = "com.github.moxy-community:moxy-compiler", version.ref = "moxy" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-
