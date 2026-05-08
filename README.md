@@ -4,12 +4,12 @@
 
 ![Platform](https://img.shields.io/badge/platform-Android-green.svg)
 ![API](https://img.shields.io/badge/API-29%2B-brightgreen.svg)
-![Kotlin](https://img.shields.io/badge/Kotlin-1.9+-purple.svg)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Kotlin](https://img.shields.io/badge/Kotlin-purple.svg)
+![Architecture](https://img.shields.io/badge/architecture-Clean%20Architecture-blue.svg)
 
-*A modern Android application for creating and managing your music playlists*
+*A modern Android application for searching, previewing, and managing music tracks*
 
-[Features](#features) • [Screenshots](#screenshots) • [Tech Stack](#tech-stack) • [Installation](#installation) • [Contributing](#contributing)
+[Features](#features) • [Screenshots](#screenshots) • [Tech Stack](#tech-stack) • [Project Structure](#project-structure)
 
 </div>
 
@@ -17,43 +17,61 @@
 
 ## About
 
-Playlist Maker is an Android application for searching tracks, previewing audio, and managing a growing music experience. The project is being developed step by step using modern Android practices and Clean Architecture principles.
+Playlist Maker is an Android application for searching music tracks via the iTunes Search API, listening to 30-second previews, and saving recently opened tracks to search history.
+The project is developed using MVVM and Clean Architecture principles with a feature-based package structure.
+
+---
 
 ## Features
 
-- **Track Search** — Search for music tracks via the iTunes Search API
-- **Search History** — Quickly return to recently opened tracks
+- **Track Search** — Search for music tracks using the iTunes Search API
+- **Search History** — Save and display recently opened tracks
 - **Audio Player** — Listen to 30-second track previews
-- **Media Library** — Screen prepared for further playlist and library features
-- **Dark Theme** — Toggle dark mode in settings
-- **Share App** — Share the app link with others
-- **Support** — Contact support directly from the app
-- **User Agreement** — Open the agreement page from settings
+- **Dark Theme** — Enable or disable dark mode in settings
+- **Share App** — Share the app link with other users
+- **Support** — Contact support via email
+- **User Agreement** — Open the user agreement page
+- **Media Library** — Screen prepared for future media library and playlist features
+
+---
 
 ## Screenshots
 
 > TBD
 
+---
+
 ## Tech Stack
 
 - **Language:** Kotlin
-- **Min SDK:** 29 (Android 10)
+- **Min SDK:** 29
 - **Target SDK:** 36
-- **Architecture:** Clean Architecture (Data / Domain / Presentation)
+- **Architecture:** MVVM + Clean Architecture
+- **Package Structure:** Feature-based
 - **Networking:** Retrofit + Gson Converter
 - **Image Loading:** Glide
-- **Storage:** SharedPreferences
+- **Local Storage:** SharedPreferences
 - **Audio Playback:** MediaPlayer
-- **UI:** Material Design Components
-- **Build System:** Gradle (Kotlin DSL)
+- **UI:** XML layouts + Material Components
+- **Build System:** Gradle Kotlin DSL
 
-### Dependencies
+---
 
-- AndroidX Core KTX
-- AndroidX AppCompat
-- Material Components
-- ConstraintLayout
-- AndroidX Activity
+## Architecture
+
+The project follows Clean Architecture principles and is split into three main layers inside each feature:
+
+- **UI layer** — Activities, ViewModels, screen states, adapters
+- **Domain layer** — Interactors, repository interfaces, business models
+- **Data layer** — Repository implementations, Retrofit API, SharedPreferences, MediaPlayer, external Android intents
+
+General dependency direction:
+
+```text
+UI → Domain → Data
+
+The UI layer communicates with the business logic through ViewModels.
+ViewModels expose immutable LiveData with screen state models and do not reference Activities directly.
 
 ## Installation
 
