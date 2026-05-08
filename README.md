@@ -69,7 +69,7 @@ General dependency direction:
 
 ```text
 UI → Domain → Data
-
+```
 The UI layer communicates with the business logic through ViewModels.
 ViewModels expose immutable LiveData with screen state models and do not reference Activities directly.
 
