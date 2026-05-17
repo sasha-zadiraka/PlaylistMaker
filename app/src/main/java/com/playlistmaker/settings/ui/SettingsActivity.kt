@@ -4,14 +4,14 @@ import android.os.Bundle
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.example.playlistmaker.R
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var themeSwitcher: SwitchMaterial
-    private lateinit var viewModel: SettingsViewModel
+    private val viewModel by viewModel<SettingsViewModel>()
 
     private lateinit var buttonBack: ImageButton
     private lateinit var buttonShare: FrameLayout
@@ -23,8 +23,11 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
 
         initViews()
-        initViewModel()
         setupListeners()
+
+        viewModel.observeState().observe(this) { state ->
+            render(state)
+        }
 
         viewModel.loadSettings()
     }
@@ -35,17 +38,6 @@ class SettingsActivity : AppCompatActivity() {
         buttonSupport = findViewById(R.id.button_support)
         buttonAgreement = findViewById(R.id.button_user_agreement)
         themeSwitcher = findViewById(R.id.themeSwitcher)
-    }
-
-    private fun initViewModel() {
-        viewModel = ViewModelProvider(
-            this,
-            SettingsViewModelFactory(this)
-        )[SettingsViewModel::class.java]
-
-        viewModel.observeState().observe(this) { state ->
-            render(state)
-        }
     }
 
     private fun setupListeners() {

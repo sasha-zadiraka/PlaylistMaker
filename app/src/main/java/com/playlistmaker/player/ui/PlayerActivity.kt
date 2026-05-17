@@ -10,7 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.playlistmaker.search.domain.models.Track
@@ -35,7 +35,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var albumLabel: TextView
     private lateinit var yearLabel: TextView
 
-    private lateinit var viewModel: PlayerViewModel
+    private val viewModel by viewModel<PlayerViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,8 +43,11 @@ class PlayerActivity : AppCompatActivity() {
         setContentView(R.layout.activity_player)
 
         initViews()
-        initViewModel()
         setupListeners()
+
+        viewModel.observeState().observe(this) { state ->
+            render(state)
+        }
 
         val track = intent.getSerializableExtra(TRACK_KEY) as? Track
         track?.let {
@@ -73,17 +76,6 @@ class PlayerActivity : AppCompatActivity() {
         countryValue = findViewById(R.id.countryValue)
         albumLabel = findViewById(R.id.albumLabel)
         yearLabel = findViewById(R.id.yearLabel)
-    }
-
-    private fun initViewModel() {
-        viewModel = ViewModelProvider(
-            this,
-            PlayerViewModelFactory()
-        )[PlayerViewModel::class.java]
-
-        viewModel.observeState().observe(this) { state ->
-            render(state)
-        }
     }
 
     private fun setupListeners() {
