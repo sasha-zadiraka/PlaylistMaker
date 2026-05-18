@@ -13,6 +13,7 @@ glide = "5.0.5"
 retrofit = "2.11.0"
 okhttp = "4.12.0"
 moxy = "2.2.2"
+koin-bom = "4.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -30,6 +31,8 @@ okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor",
 moxy = { module = "com.github.moxy-community:moxy", version.ref = "moxy" }
 moxy-android = { module = "com.github.moxy-community:moxy-android", version.ref = "moxy" }
 moxy-compiler = { module = "com.github.moxy-community:moxy-compiler", version.ref = "moxy" }
+koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
+koin-android = { module = "io.insert-koin:koin-android" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

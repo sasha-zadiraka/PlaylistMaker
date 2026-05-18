@@ -22,7 +22,7 @@ import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
-import androidx.lifecycle.ViewModelProvider
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.playlistmaker.player.ui.PlayerActivity
 import com.playlistmaker.util.AppConstants.CLICK_DEBOUNCE_DELAY
 import com.playlistmaker.util.AppConstants.KEY_SEARCH_TEXT
@@ -55,7 +55,7 @@ class SearchActivity : AppCompatActivity() {
 
     private val handler = Handler(Looper.getMainLooper())
 
-    private lateinit var viewModel: SearchViewModel
+    private val viewModel by viewModel<SearchViewModel>()
 
     private enum class SearchMessageState {
         EMPTY,
@@ -68,9 +68,12 @@ class SearchActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search)
 
         initViews()
-        initViewModel()
         initAdapters()
         setupListeners()
+
+        viewModel.observeState().observe(this) { state ->
+            render(state)
+        }
 
         viewModel.showHistoryIfNeeded()
 
@@ -132,17 +135,6 @@ class SearchActivity : AppCompatActivity() {
 
         historyRecycler.layoutManager = LinearLayoutManager(this)
         historyRecycler.adapter = historyAdapter
-    }
-
-    private fun initViewModel() {
-        viewModel = ViewModelProvider(
-            this,
-            SearchViewModelFactory(this)
-        )[SearchViewModel::class.java]
-
-        viewModel.observeState().observe(this) { state ->
-            render(state)
-        }
     }
 
     private fun setupListeners() {
