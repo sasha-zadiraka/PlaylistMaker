@@ -27,6 +27,11 @@ android {
             )
         }
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -54,4 +59,5 @@ dependencies {
     add("kapt", libs.moxy.compiler)
     implementation(libs.koin.android)
     implementation(platform(libs.koin.bom))
+    implementation(libs.androidx.viewpager2)
 }

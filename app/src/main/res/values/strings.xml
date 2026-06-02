@@ -32,4 +32,12 @@
     <string name="screen_player_track_year">Год</string>
     <string name="screen_player_track_genre">Жанр</string>
     <string name="screen_player_track_country">Страна</string>
+
+    // media library screen
+    <string name="screen_media_library_title">Медиатека</string>
+    <string name="screen_media_library_favorite_tracks_tab_title">Избранные треки</string>
+    <string name="screen_media_library_playlists_tab_title">Плейлисты</string>
+    <string name="screen_media_library_empty_tracks_response">Ваша медиатека пуста</string>
+    <string name="screen_media_library_empty_playlist_response">Вы не создали\n ни одного плейлиста</string>
+    <string name="screen_media_library_new_playlist_button">Новый плейлист</string>
 </resources>

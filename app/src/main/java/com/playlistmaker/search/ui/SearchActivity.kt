@@ -207,7 +207,7 @@ class SearchActivity : AppCompatActivity() {
 
         when (state) {
             SearchMessageState.EMPTY -> {
-                errorImage.setImageResource(R.drawable.ic_empty_track_list_120)
+                errorImage.setImageResource(R.drawable.ic_empty_state_120)
                 buttonRetry.isVisible = false
             }
 
