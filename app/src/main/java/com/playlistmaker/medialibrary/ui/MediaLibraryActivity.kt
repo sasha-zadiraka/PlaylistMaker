@@ -43,10 +43,7 @@ class MediaLibraryActivity : AppCompatActivity() {
                 FAVORITE_TRACKS_TAB_POSITION ->
                     getString(R.string.screen_media_library_favorite_tracks_tab_title)
 
-                PLAYLISTS_TAB_POSITION ->
-                    getString(R.string.screen_media_library_playlists_tab_title)
-
-                else -> ""
+                else -> getString(R.string.screen_media_library_playlists_tab_title)
             }
 
             tab.customView = tabView
