@@ -82,4 +82,12 @@
         <item name="android:scaleType">centerInside</item>
         <item name="android:tint">?attr/colorAccent</item>
     </style>
+
+    <style name="MediaLibraryTabText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:gravity">center</item>
+    </style>
 </resources>
