@@ -1,14 +1,13 @@
 package com.playlistmaker.medialibrary.ui
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.playlistmaker.medialibrary.ui.favorites.FavoriteTracksFragment
 import com.playlistmaker.medialibrary.ui.playlists.PlaylistsFragment
 
 class MediaLibraryViewPagerAdapter(
-    activity: FragmentActivity
-) : FragmentStateAdapter(activity) {
+    fragment: Fragment,
+) : FragmentStateAdapter(fragment) {
 
     override fun getItemCount(): Int = TAB_COUNT
 

@@ -1,34 +1,68 @@
 package com.playlistmaker.main.ui
 
-import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.playlistmaker.R
-import com.playlistmaker.medialibrary.ui.MediaLibraryActivity
-import com.playlistmaker.search.ui.SearchActivity
-import com.playlistmaker.settings.ui.SettingsActivity
+import com.example.playlistmaker.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        val buttonSearch = findViewById<Button>(R.id.button_search)
-        val buttonMediaLibrary = findViewById<Button>(R.id.button_media_library)
-        val buttonSettings = findViewById<Button>(R.id.button_settings)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        buttonSearch.setOnClickListener {
-            startActivity(Intent(this, SearchActivity::class.java))
+        setupNavigation()
+        setupInsets()
+    }
+
+    private fun setupNavigation() {
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+
+        val navController = navHostFragment.navController
+
+        binding.bottomNavigationView.setupWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            binding.bottomNavigationView.isVisible = destination.id != R.id.playerFragment
         }
+    }
 
-        buttonMediaLibrary.setOnClickListener {
-            startActivity(Intent(this, MediaLibraryActivity::class.java))
-        }
+    private fun setupInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { _, insets ->
+            val statusBars = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+            val navigationBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+            val isKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
 
-        buttonSettings.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
+            binding.navHostFragment.updatePadding(
+                top = statusBars.top
+            )
+
+            binding.bottomNavigationView.updatePadding(
+                bottom = navigationBars.bottom
+            )
+
+            binding.bottomNavigationView.isVisible =
+                !isKeyboardVisible && getCurrentDestinationId() != R.id.playerFragment
+
+            insets
         }
+    }
+
+    private fun getCurrentDestinationId(): Int? {
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as? NavHostFragment
+
+        return navHostFragment?.navController?.currentDestination?.id
     }
 }
