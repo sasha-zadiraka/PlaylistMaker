@@ -3,34 +3,35 @@ package com.playlistmaker.medialibrary.ui
 import android.graphics.Color
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.AttrRes
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivityMediaLibraryBinding
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.example.playlistmaker.databinding.FragmentMediaLibraryBinding
+class MediaLibraryFragment : Fragment() {
 
-class MediaLibraryActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityMediaLibraryBinding
+    private var _binding: FragmentMediaLibraryBinding? = null
+    private val binding get() = _binding!!
 
     private val viewModel by viewModel<MediaLibraryViewModel>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
+        _binding = FragmentMediaLibraryBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        binding = ActivityMediaLibraryBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        binding.toolbar.setNavigationOnClickListener {
-            finish()
-        }
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.viewPager.adapter = MediaLibraryViewPagerAdapter(this)
-
         setupTabs()
     }
 
@@ -53,7 +54,6 @@ class MediaLibraryActivity : AppCompatActivity() {
 
         binding.tabLayout.addOnTabSelectedListener(
             object : TabLayout.OnTabSelectedListener {
-
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     updateTabs()
                 }
@@ -89,8 +89,13 @@ class MediaLibraryActivity : AppCompatActivity() {
 
     private fun getThemeColor(@AttrRes attr: Int): Int {
         val typedValue = TypedValue()
-        theme.resolveAttribute(attr, typedValue, true)
+        requireActivity().theme.resolveAttribute(attr, typedValue, true)
         return typedValue.data
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {
