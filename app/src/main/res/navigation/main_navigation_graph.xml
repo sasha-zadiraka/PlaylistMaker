@@ -32,6 +32,6 @@
     <fragment
         android:id="@+id/playerFragment"
         android:name="com.playlistmaker.player.ui.PlayerFragment"
-        android:label="Player" />
+        android:label="@string/screen_player_title"/>
 
 </navigation>

@@ -39,7 +39,7 @@ class PlayerFragment : Fragment() {
             render(state)
         }
 
-        val track = arguments?.getSerializable(TRACK_KEY) as? Track
+        val track = arguments?.getParcelable<Track>(TRACK_KEY)
 
         track?.let {
             fillData(it)

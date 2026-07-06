@@ -12,7 +12,7 @@ fun TrackDto.toTrack(): Track {
     val formattedReleaseYear = releaseDate?.take(4) ?: ""
 
     return Track(
-        trackId = trackId ?: 0,
+        trackId = trackId ?: 0L,
         trackName = trackName.orEmpty(),
         artistName = artistName.orEmpty(),
         trackTime = formattedTrackTime,

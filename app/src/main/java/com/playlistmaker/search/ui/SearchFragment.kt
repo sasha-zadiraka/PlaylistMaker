@@ -181,7 +181,7 @@ class SearchFragment : Fragment() {
 
     private fun openPlayer(track: Track) {
         val bundle = Bundle().apply {
-            putSerializable(TRACK_KEY, track)
+            putParcelable(TRACK_KEY, track)
         }
 
         findNavController().navigate(
