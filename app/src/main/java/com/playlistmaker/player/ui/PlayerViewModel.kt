@@ -1,13 +1,15 @@
 package com.playlistmaker.player.ui
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.playlistmaker.player.domain.PlayerInteractor
 import com.playlistmaker.util.AppConstants.PLAYER_PROGRESS_UPDATE_DELAY
 import com.playlistmaker.util.AppConstants.ZERO_TIME
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -18,21 +20,7 @@ class PlayerViewModel(
     private val stateLiveData = MutableLiveData(PlayerState())
     fun observeState(): LiveData<PlayerState> = stateLiveData
 
-    private val handler = Handler(Looper.getMainLooper())
-
-    private val progressRunnable = object : Runnable {
-        override fun run() {
-            if (playerInteractor.isPlaying()) {
-                stateLiveData.postValue(
-                    stateLiveData.value?.copy(
-                        isPlaying = true,
-                        progress = formatTime(playerInteractor.getCurrentPosition())
-                    )
-                )
-                handler.postDelayed(this, PLAYER_PROGRESS_UPDATE_DELAY)
-            }
-        }
-    }
+    private var progressJob: Job? = null
 
     fun preparePlayer(url: String) {
         playerInteractor.prepare(
@@ -46,7 +34,7 @@ class PlayerViewModel(
                 )
             },
             onCompletion = {
-                handler.removeCallbacks(progressRunnable)
+                stopProgressUpdate()
                 stateLiveData.postValue(
                     stateLiveData.value?.copy(
                         isPrepared = true,
@@ -72,7 +60,7 @@ class PlayerViewModel(
 
     fun pausePlayer() {
         playerInteractor.pause()
-        handler.removeCallbacks(progressRunnable)
+        stopProgressUpdate()
 
         stateLiveData.value = stateLiveData.value?.copy(
             isPlaying = false
@@ -86,7 +74,27 @@ class PlayerViewModel(
             isPlaying = true
         )
 
-        handler.post(progressRunnable)
+        startProgressUpdate()
+    }
+
+    private fun startProgressUpdate() {
+        progressJob?.cancel()
+
+        progressJob = viewModelScope.launch {
+            while (playerInteractor.isPlaying()) {
+                stateLiveData.value = stateLiveData.value?.copy(
+                    isPlaying = true,
+                    progress = formatTime(playerInteractor.getCurrentPosition())
+                )
+
+                delay(PLAYER_PROGRESS_UPDATE_DELAY)
+            }
+        }
+    }
+
+    private fun stopProgressUpdate() {
+        progressJob?.cancel()
+        progressJob = null
     }
 
     private fun formatTime(position: Int): String {
@@ -95,7 +103,7 @@ class PlayerViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        handler.removeCallbacks(progressRunnable)
+        stopProgressUpdate()
         playerInteractor.release()
     }
 }

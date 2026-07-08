@@ -1,24 +1,26 @@
 package com.playlistmaker.search.ui
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import com.example.playlistmaker.databinding.FragmentSearchBinding
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
+import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.playlistmaker.search.domain.models.Track
 import com.playlistmaker.util.AppConstants.CLICK_DEBOUNCE_DELAY
 import com.playlistmaker.util.AppConstants.KEY_SEARCH_TEXT
 import com.playlistmaker.util.AppConstants.TRACK_KEY
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
@@ -34,8 +36,7 @@ class SearchFragment : Fragment() {
 
     private var searchText: String = ""
     private var isClickAllowed = true
-
-    private val handler = Handler(Looper.getMainLooper())
+    private var clickDebounceJob: Job? = null
 
     private val viewModel by viewModel<SearchViewModel>()
 
@@ -192,10 +193,17 @@ class SearchFragment : Fragment() {
 
     private fun clickDebounce(): Boolean {
         val current = isClickAllowed
+
         if (isClickAllowed) {
             isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+
+            clickDebounceJob?.cancel()
+            clickDebounceJob = viewLifecycleOwner.lifecycleScope.launch {
+                delay(CLICK_DEBOUNCE_DELAY)
+                isClickAllowed = true
+            }
         }
+
         return current
     }
 
@@ -280,6 +288,7 @@ class SearchFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        clickDebounceJob?.cancel()
         binding.tracksRecycler.adapter = null
         binding.tracksHistoryRecycler.adapter = null
         _binding = null
