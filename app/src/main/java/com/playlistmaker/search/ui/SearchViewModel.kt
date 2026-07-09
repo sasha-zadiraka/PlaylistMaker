@@ -25,9 +25,8 @@ class SearchViewModel(
     private var searchJob: Job? = null
 
     fun onSearchTextChanged(text: String) {
-        latestSearchText = text
-
         searchJob?.cancel()
+        latestSearchText = text
 
         if (text.isEmpty()) {
             stateLiveData.value = SearchState.NothingFound
@@ -107,13 +106,5 @@ class SearchViewModel(
     override fun onCleared() {
         super.onCleared()
         searchJob?.cancel()
-    }
-
-    fun hasState(): Boolean {
-        return stateLiveData.value != null
-    }
-
-    fun getLatestSearchText(): String {
-        return latestSearchText
     }
 }

@@ -18,6 +18,7 @@ import com.playlistmaker.search.domain.models.Track
 import com.playlistmaker.util.AppConstants.CLICK_DEBOUNCE_DELAY
 import com.playlistmaker.util.AppConstants.KEY_SEARCH_TEXT
 import com.playlistmaker.util.AppConstants.TRACK_KEY
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -30,13 +31,12 @@ class SearchFragment : Fragment() {
 
     private lateinit var trackAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
+    private lateinit var onTrackClickDebounce: (Track) -> Unit
 
     private val trackList = mutableListOf<Track>()
     private val historyTrackList = mutableListOf<Track>()
 
     private var searchText: String = ""
-    private var isClickAllowed = true
-    private var clickDebounceJob: Job? = null
 
     private val viewModel by viewModel<SearchViewModel>()
 
@@ -55,6 +55,7 @@ class SearchFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        initClickDebounce()
         initAdapters()
         setupListeners()
 
@@ -78,20 +79,24 @@ class SearchFragment : Fragment() {
         outState.putString(KEY_SEARCH_TEXT, searchText)
     }
 
+    private fun initClickDebounce() {
+        onTrackClickDebounce = debounce<Track>(
+            delayMillis = CLICK_DEBOUNCE_DELAY,
+            coroutineScope = lifecycleScope,
+            useLastParam = false
+        ) { track ->
+            viewModel.saveTrackToHistory(track)
+            openPlayer(track)
+        }
+    }
+
     private fun initAdapters() {
         trackAdapter = TrackAdapter(trackList) { track ->
-            if (clickDebounce()) {
-                viewModel.saveTrackToHistory(track)
-                openPlayer(track)
-            }
+            onTrackClickDebounce(track)
         }
 
         historyAdapter = TrackAdapter(historyTrackList) { track ->
-            if (clickDebounce()) {
-                viewModel.saveTrackToHistory(track)
-                viewModel.showHistoryIfNeeded()
-                openPlayer(track)
-            }
+            onTrackClickDebounce(track)
         }
 
         binding.tracksRecycler.layoutManager = LinearLayoutManager(requireContext())
@@ -191,22 +196,6 @@ class SearchFragment : Fragment() {
         )
     }
 
-    private fun clickDebounce(): Boolean {
-        val current = isClickAllowed
-
-        if (isClickAllowed) {
-            isClickAllowed = false
-
-            clickDebounceJob?.cancel()
-            clickDebounceJob = viewLifecycleOwner.lifecycleScope.launch {
-                delay(CLICK_DEBOUNCE_DELAY)
-                isClickAllowed = true
-            }
-        }
-
-        return current
-    }
-
     private fun render(state: SearchState) {
         when (state) {
             is SearchState.Loading -> {
@@ -286,9 +275,34 @@ class SearchFragment : Fragment() {
         }
     }
 
+    private fun <T> debounce(
+        delayMillis: Long,
+        coroutineScope: CoroutineScope,
+        useLastParam: Boolean,
+        action: (T) -> Unit
+    ): (T) -> Unit {
+        var debounceJob: Job? = null
+
+        return { param: T ->
+            if (useLastParam) {
+                debounceJob?.cancel()
+                debounceJob = coroutineScope.launch {
+                    delay(delayMillis)
+                    action(param)
+                }
+            } else {
+                if (debounceJob?.isCompleted != false) {
+                    debounceJob = coroutineScope.launch {
+                        action(param)
+                        delay(delayMillis)
+                    }
+                }
+            }
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
-        clickDebounceJob?.cancel()
         binding.tracksRecycler.adapter = null
         binding.tracksHistoryRecycler.adapter = null
         _binding = null
