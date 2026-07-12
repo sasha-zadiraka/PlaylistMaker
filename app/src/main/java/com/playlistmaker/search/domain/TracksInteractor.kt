@@ -1,7 +1,8 @@
 package com.playlistmaker.search.domain
 
 import com.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.flow.Flow
 
 interface TracksInteractor {
-    fun searchTracks(query: String, callback: (List<Track>?) -> Unit)
+    fun searchTracks(query: String): Flow<List<Track>?>
 }
