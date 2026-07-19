@@ -1,5 +1,7 @@
 package com.playlistmaker.di
 
+import com.playlistmaker.medialibrary.data.FavoriteTracksRepositoryImpl
+import com.playlistmaker.medialibrary.domain.FavoriteTracksRepository
 import com.playlistmaker.search.data.SearchHistoryRepositoryImpl
 import com.playlistmaker.search.data.TracksRepositoryImpl
 import com.playlistmaker.search.domain.SearchHistoryRepository
@@ -11,17 +13,25 @@ import org.koin.dsl.module
 val repositoryModule = module {
 
     single<TracksRepository> {
-        TracksRepositoryImpl(get())
+        TracksRepositoryImpl(
+            itunesApi = get(),
+            database = get()
+        )
     }
 
     single<SearchHistoryRepository> {
         SearchHistoryRepositoryImpl(
             sharedPreferences = get(),
-            gson = get()
+            gson = get(),
+            database = get()
         )
     }
 
     single<ThemeRepository> {
         ThemeRepositoryImpl(get())
+    }
+
+    single<FavoriteTracksRepository> {
+        FavoriteTracksRepositoryImpl(get())
     }
 }

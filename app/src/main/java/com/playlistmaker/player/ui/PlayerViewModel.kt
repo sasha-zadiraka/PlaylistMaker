@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.playlistmaker.medialibrary.domain.FavoriteTracksInteractor
 import com.playlistmaker.player.domain.PlayerInteractor
+import com.playlistmaker.search.domain.models.Track
 import com.playlistmaker.util.AppConstants.PLAYER_PROGRESS_UPDATE_DELAY
 import com.playlistmaker.util.AppConstants.ZERO_TIME
 import kotlinx.coroutines.Job
@@ -14,13 +16,43 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class PlayerViewModel(
-    private val playerInteractor: PlayerInteractor
+    private val playerInteractor: PlayerInteractor,
+    private val favoriteTracksInteractor: FavoriteTracksInteractor
 ) : ViewModel() {
 
     private val stateLiveData = MutableLiveData(PlayerState())
     fun observeState(): LiveData<PlayerState> = stateLiveData
 
+    private var currentTrack: Track? = null
+
     private var progressJob: Job? = null
+
+    fun setTrack(track: Track) {
+        currentTrack = track
+
+        stateLiveData.value = stateLiveData.value?.copy(
+            isFavorite = track.isFavorite
+        )
+    }
+
+    fun onFavoriteClicked() {
+        val track = currentTrack ?: return
+        val isFavorite = stateLiveData.value?.isFavorite ?: false
+
+        viewModelScope.launch {
+            if (isFavorite) {
+                favoriteTracksInteractor.deleteTrack(track)
+            } else {
+                favoriteTracksInteractor.addTrack(track)
+            }
+
+            track.isFavorite = !isFavorite
+
+            stateLiveData.value = stateLiveData.value?.copy(
+                isFavorite = !isFavorite
+            )
+        }
+    }
 
     fun preparePlayer(url: String) {
         playerInteractor.prepare(
@@ -98,7 +130,10 @@ class PlayerViewModel(
     }
 
     private fun formatTime(position: Int): String {
-        return SimpleDateFormat("mm:ss", Locale.getDefault()).format(position)
+        return SimpleDateFormat(
+            "mm:ss",
+            Locale.getDefault()
+        ).format(position)
     }
 
     override fun onCleared() {

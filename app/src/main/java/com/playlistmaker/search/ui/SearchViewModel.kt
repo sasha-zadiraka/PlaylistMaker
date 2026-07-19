@@ -51,12 +51,14 @@ class SearchViewModel(
     }
 
     fun showHistoryIfNeeded() {
-        val history = searchHistoryInteractor.getHistory()
+        viewModelScope.launch {
+            val history = searchHistoryInteractor.getHistory()
 
-        if (latestSearchText.isEmpty() && history.isNotEmpty()) {
-            stateLiveData.value = SearchState.History(history)
-        } else {
-            stateLiveData.value = SearchState.NothingFound
+            if (latestSearchText.isEmpty() && history.isNotEmpty()) {
+                stateLiveData.value = SearchState.History(history)
+            } else {
+                stateLiveData.value = SearchState.NothingFound
+            }
         }
     }
 
@@ -66,7 +68,9 @@ class SearchViewModel(
     }
 
     fun saveTrackToHistory(track: Track) {
-        searchHistoryInteractor.addTrack(track)
+        viewModelScope.launch {
+            searchHistoryInteractor.addTrack(track)
+        }
     }
 
     private fun searchDebounce() {

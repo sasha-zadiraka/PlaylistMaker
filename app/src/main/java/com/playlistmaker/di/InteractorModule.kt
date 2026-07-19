@@ -1,5 +1,8 @@
 package com.playlistmaker.di
 
+import com.example.playlistmaker.R
+import com.playlistmaker.medialibrary.domain.FavoriteTracksInteractor
+import com.playlistmaker.medialibrary.domain.FavoriteTracksInteractorImpl
 import com.playlistmaker.player.domain.PlayerInteractor
 import com.playlistmaker.player.domain.PlayerInteractorImpl
 import com.playlistmaker.search.domain.SearchHistoryInteractor
@@ -12,7 +15,6 @@ import com.playlistmaker.sharing.domain.SharingInteractor
 import com.playlistmaker.sharing.domain.SharingInteractorImpl
 import com.playlistmaker.sharing.domain.models.EmailData
 import com.playlistmaker.sharing.domain.models.SharingData
-import com.example.playlistmaker.R
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -55,5 +57,9 @@ val interactorModule = module {
             sharingData = get(),
             emailData = get()
         )
+    }
+
+    single<FavoriteTracksInteractor> {
+        FavoriteTracksInteractorImpl(get())
     }
 }

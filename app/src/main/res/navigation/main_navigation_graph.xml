@@ -7,7 +7,17 @@
     <fragment
         android:id="@+id/mediaLibraryFragment"
         android:name="com.playlistmaker.medialibrary.ui.MediaLibraryFragment"
-        android:label="@string/screen_media_library_title" />
+        android:label="@string/screen_media_library_title">
+
+        <action
+            android:id="@+id/action_mediaLibraryFragment_to_playerFragment"
+            app:destination="@id/playerFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/searchFragment"

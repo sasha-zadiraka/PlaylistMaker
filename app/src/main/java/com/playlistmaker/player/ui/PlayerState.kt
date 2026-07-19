@@ -5,5 +5,6 @@ import com.playlistmaker.util.AppConstants.ZERO_TIME
 data class PlayerState(
     val isPrepared: Boolean = false,
     val isPlaying: Boolean = false,
-    val progress: String = ZERO_TIME
+    val progress: String = ZERO_TIME,
+    val isFavorite: Boolean = false
 )
