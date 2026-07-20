@@ -15,7 +15,7 @@ val repositoryModule = module {
     single<TracksRepository> {
         TracksRepositoryImpl(
             itunesApi = get(),
-            database = get()
+            trackDao = get()
         )
     }
 
@@ -32,6 +32,8 @@ val repositoryModule = module {
     }
 
     single<FavoriteTracksRepository> {
-        FavoriteTracksRepositoryImpl(get())
+        FavoriteTracksRepositoryImpl(
+            trackDao = get()
+        )
     }
 }

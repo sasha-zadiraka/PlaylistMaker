@@ -1,6 +1,6 @@
 package com.playlistmaker.medialibrary.data
 
-import com.playlistmaker.data.db.AppDatabase
+import com.playlistmaker.data.db.TrackDao
 import com.playlistmaker.data.db.mapper.toEntity
 import com.playlistmaker.data.db.mapper.toTrack
 import com.playlistmaker.medialibrary.domain.FavoriteTracksRepository
@@ -9,24 +9,20 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class FavoriteTracksRepositoryImpl(
-    private val database: AppDatabase
+    private val trackDao: TrackDao
 ) : FavoriteTracksRepository {
 
     override suspend fun addTrack(track: Track) {
-        database.trackDao().insertTrack(track.toEntity())
+        trackDao.insertTrack(track.toEntity())
     }
 
     override suspend fun deleteTrack(track: Track) {
-        database.trackDao().deleteTrack(track.toEntity())
+        trackDao.deleteTrack(track.toEntity())
     }
 
     override fun getFavoriteTracks(): Flow<List<Track>> {
-        return database.trackDao()
-            .getFavoriteTracks()
-            .map { entities ->
-                entities.map { entity ->
-                    entity.toTrack()
-                }
-            }
+        return trackDao.getFavoriteTracks().map { entities ->
+            entities.map { it.toTrack() }
+        }
     }
 }
