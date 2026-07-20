@@ -43,6 +43,7 @@ class PlayerFragment : Fragment() {
 
         track?.let {
             fillData(it)
+            viewModel.setTrack(it)
             viewModel.preparePlayer(it.previewUrl)
         }
     }
@@ -54,6 +55,10 @@ class PlayerFragment : Fragment() {
 
         binding.buttonPlay.setOnClickListener {
             viewModel.playbackControl()
+        }
+
+        binding.buttonFavorite.setOnClickListener {
+            viewModel.onFavoriteClicked()
         }
     }
 
@@ -88,6 +93,16 @@ class PlayerFragment : Fragment() {
             binding.buttonPlay.setImageResource(R.drawable.ic_pause_83)
         } else {
             binding.buttonPlay.setImageResource(R.drawable.ic_play_83)
+        }
+
+        if (state.isFavorite) {
+            binding.buttonFavorite.setImageResource(
+                R.drawable.ic_favorite_active_23
+            )
+        } else {
+            binding.buttonFavorite.setImageResource(
+                R.drawable.ic_add_to_favorite_23
+            )
         }
     }
 

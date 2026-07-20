@@ -1,7 +1,10 @@
 package com.playlistmaker.di
 
 import android.content.Context
+import androidx.room.Room
 import com.google.gson.Gson
+import com.playlistmaker.data.db.AppDatabase
+import com.playlistmaker.data.db.TrackDao
 import com.playlistmaker.player.data.PlayerRepositoryImpl
 import com.playlistmaker.player.domain.PlayerRepository
 import com.playlistmaker.search.data.network.ItunesApi
@@ -48,5 +51,17 @@ val dataModule = module {
 
     factory<PlayerRepository> {
         PlayerRepositoryImpl()
+    }
+
+    single {
+        Room.databaseBuilder(
+            androidContext(),
+            AppDatabase::class.java,
+            "playlistmaker.db"
+        ).build()
+    }
+
+    single<TrackDao> {
+        get<AppDatabase>().trackDao()
     }
 }

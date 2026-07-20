@@ -34,7 +34,15 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavigationView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            binding.bottomNavigationView.isVisible = destination.id != R.id.playerFragment
+
+            val isBottomNavigationVisible =
+                destination.id != R.id.playerFragment
+
+            binding.bottomNavigationView.isVisible =
+                isBottomNavigationVisible
+
+            binding.bottomNavigationDivider.isVisible =
+                isBottomNavigationVisible
         }
     }
 

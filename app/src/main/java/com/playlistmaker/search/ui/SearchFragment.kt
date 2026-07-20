@@ -33,9 +33,6 @@ class SearchFragment : Fragment() {
     private lateinit var historyAdapter: TrackAdapter
     private lateinit var onTrackClickDebounce: (Track) -> Unit
 
-    private val trackList = mutableListOf<Track>()
-    private val historyTrackList = mutableListOf<Track>()
-
     private var searchText: String = ""
 
     private val viewModel by viewModel<SearchViewModel>()
@@ -54,7 +51,12 @@ class SearchFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+
         initClickDebounce()
         initAdapters()
         setupListeners()
@@ -63,13 +65,16 @@ class SearchFragment : Fragment() {
             render(state)
         }
 
-        savedInstanceState?.getString(KEY_SEARCH_TEXT)?.let { restoredText ->
-            binding.inputSearch.setText(restoredText)
-            binding.inputSearch.setSelection(restoredText.length)
-            binding.clearCrossIcon.isVisible = restoredText.isNotEmpty()
-            searchText = restoredText
-            viewModel.onSearchTextChanged(restoredText)
-        }
+        savedInstanceState
+            ?.getString(KEY_SEARCH_TEXT)
+            ?.let { restoredText ->
+                binding.inputSearch.setText(restoredText)
+                binding.inputSearch.setSelection(restoredText.length)
+                binding.clearCrossIcon.isVisible = restoredText.isNotEmpty()
+
+                searchText = restoredText
+                viewModel.onSearchTextChanged(restoredText)
+            }
 
         viewModel.showHistoryIfNeeded()
     }
@@ -80,30 +85,34 @@ class SearchFragment : Fragment() {
     }
 
     private fun initClickDebounce() {
-        onTrackClickDebounce = debounce<Track>(
+        onTrackClickDebounce = debounce(
             delayMillis = CLICK_DEBOUNCE_DELAY,
             coroutineScope = lifecycleScope,
             useLastParam = false
-        ) { track ->
+        ) { track: Track ->
             viewModel.saveTrackToHistory(track)
             openPlayer(track)
         }
     }
 
     private fun initAdapters() {
-        trackAdapter = TrackAdapter(trackList) { track ->
+        trackAdapter = TrackAdapter { track ->
             onTrackClickDebounce(track)
         }
 
-        historyAdapter = TrackAdapter(historyTrackList) { track ->
+        historyAdapter = TrackAdapter { track ->
             onTrackClickDebounce(track)
         }
 
-        binding.tracksRecycler.layoutManager = LinearLayoutManager(requireContext())
-        binding.tracksRecycler.adapter = trackAdapter
+        binding.tracksRecycler.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = trackAdapter
+        }
 
-        binding.tracksHistoryRecycler.layoutManager = LinearLayoutManager(requireContext())
-        binding.tracksHistoryRecycler.adapter = historyAdapter
+        binding.tracksHistoryRecycler.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = historyAdapter
+        }
     }
 
     private fun setupListeners() {
@@ -111,22 +120,36 @@ class SearchFragment : Fragment() {
             binding.inputSearch.setText("")
             binding.inputSearch.requestFocus()
 
-            val imm = requireContext().getSystemService(InputMethodManager::class.java)
-            imm?.showSoftInput(binding.inputSearch, InputMethodManager.SHOW_IMPLICIT)
+            val inputMethodManager =
+                requireContext().getSystemService(InputMethodManager::class.java)
+
+            inputMethodManager?.showSoftInput(
+                binding.inputSearch,
+                InputMethodManager.SHOW_IMPLICIT
+            )
 
             binding.clearCrossIcon.isVisible = false
         }
 
         binding.buttonRetry.setOnClickListener {
-            viewModel.searchImmediately(binding.inputSearch.text.toString())
+            viewModel.searchImmediately(
+                binding.inputSearch.text.toString()
+            )
         }
 
         binding.inputSearch.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                viewModel.searchImmediately(binding.inputSearch.text.toString())
+                viewModel.searchImmediately(
+                    binding.inputSearch.text.toString()
+                )
 
-                val imm = requireContext().getSystemService(InputMethodManager::class.java)
-                imm?.hideSoftInputFromWindow(binding.inputSearch.windowToken, 0)
+                val inputMethodManager =
+                    requireContext().getSystemService(InputMethodManager::class.java)
+
+                inputMethodManager?.hideSoftInputFromWindow(
+                    binding.inputSearch.windowToken,
+                    0
+                )
 
                 true
             } else {
@@ -158,7 +181,10 @@ class SearchFragment : Fragment() {
         binding.historyContainer.isVisible = false
     }
 
-    private fun showMessage(state: SearchMessageState?, text: String) {
+    private fun showMessage(
+        state: SearchMessageState?,
+        text: String
+    ) {
         if (state == null) {
             binding.placeholderMessage.isVisible = false
             binding.errorImage.isVisible = false
@@ -172,12 +198,16 @@ class SearchFragment : Fragment() {
 
         when (state) {
             SearchMessageState.EMPTY -> {
-                binding.errorImage.setImageResource(R.drawable.ic_empty_state_120)
+                binding.errorImage.setImageResource(
+                    R.drawable.ic_empty_state_120
+                )
                 binding.buttonRetry.isVisible = false
             }
 
             SearchMessageState.ERROR -> {
-                binding.errorImage.setImageResource(R.drawable.ic_no_internet_120)
+                binding.errorImage.setImageResource(
+                    R.drawable.ic_no_internet_120
+                )
                 binding.buttonRetry.isVisible = true
             }
         }
@@ -198,7 +228,7 @@ class SearchFragment : Fragment() {
 
     private fun render(state: SearchState) {
         when (state) {
-            is SearchState.Loading -> {
+            SearchState.Loading -> {
                 binding.progressBar.isVisible = true
                 binding.tracksRecycler.isVisible = false
                 binding.historyContainer.isVisible = false
@@ -214,32 +244,33 @@ class SearchFragment : Fragment() {
                 binding.errorImage.isVisible = false
                 binding.buttonRetry.isVisible = false
 
-                trackList.clear()
-                trackList.addAll(state.tracks)
-                trackAdapter.notifyDataSetChanged()
-
+                trackAdapter.setItems(state.tracks)
                 binding.tracksRecycler.isVisible = true
             }
 
-            is SearchState.Empty -> {
+            SearchState.Empty -> {
                 binding.progressBar.isVisible = false
                 binding.tracksRecycler.isVisible = false
                 binding.historyContainer.isVisible = false
 
                 showMessage(
                     SearchMessageState.EMPTY,
-                    getString(R.string.screen_search_error_empty_response)
+                    getString(
+                        R.string.screen_search_error_empty_response
+                    )
                 )
             }
 
-            is SearchState.Error -> {
+            SearchState.Error -> {
                 binding.progressBar.isVisible = false
                 binding.tracksRecycler.isVisible = false
                 binding.historyContainer.isVisible = false
 
                 showMessage(
                     SearchMessageState.ERROR,
-                    getString(R.string.screen_search_error_no_internet)
+                    getString(
+                        R.string.screen_search_error_no_internet
+                    )
                 )
             }
 
@@ -250,16 +281,16 @@ class SearchFragment : Fragment() {
                 binding.errorImage.isVisible = false
                 binding.buttonRetry.isVisible = false
 
-                historyTrackList.clear()
-                historyTrackList.addAll(state.tracks)
-                historyAdapter.notifyDataSetChanged()
+                historyAdapter.setItems(state.tracks)
 
-                binding.historyContainer.isVisible = state.tracks.isNotEmpty()
-                binding.historyTitle.isVisible = state.tracks.isNotEmpty()
-                binding.buttonClearHistory.isVisible = state.tracks.isNotEmpty()
+                val hasHistory = state.tracks.isNotEmpty()
+
+                binding.historyContainer.isVisible = hasHistory
+                binding.historyTitle.isVisible = hasHistory
+                binding.buttonClearHistory.isVisible = hasHistory
             }
 
-            is SearchState.NothingFound -> {
+            SearchState.NothingFound -> {
                 binding.progressBar.isVisible = false
                 binding.tracksRecycler.isVisible = false
                 binding.historyContainer.isVisible = false
@@ -267,10 +298,8 @@ class SearchFragment : Fragment() {
                 binding.errorImage.isVisible = false
                 binding.buttonRetry.isVisible = false
 
-                trackList.clear()
-                trackAdapter.notifyDataSetChanged()
-                historyTrackList.clear()
-                historyAdapter.notifyDataSetChanged()
+                trackAdapter.setItems(emptyList())
+                historyAdapter.setItems(emptyList())
             }
         }
     }
@@ -283,9 +312,10 @@ class SearchFragment : Fragment() {
     ): (T) -> Unit {
         var debounceJob: Job? = null
 
-        return { param: T ->
+        return { param ->
             if (useLastParam) {
                 debounceJob?.cancel()
+
                 debounceJob = coroutineScope.launch {
                     delay(delayMillis)
                     action(param)
@@ -302,9 +332,10 @@ class SearchFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         binding.tracksRecycler.adapter = null
         binding.tracksHistoryRecycler.adapter = null
         _binding = null
+
+        super.onDestroyView()
     }
 }

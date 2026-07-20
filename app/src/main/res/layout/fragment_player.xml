@@ -105,7 +105,7 @@
             app:layout_constraintTop_toBottomOf="@id/artistName" />
 
         <ImageButton
-            android:id="@+id/buttonLike"
+            android:id="@+id/buttonFavorite"
             android:layout_width="51dp"
             android:layout_height="51dp"
             android:layout_marginTop="52dp"
@@ -113,8 +113,7 @@
             android:padding="14dp"
             android:src="@drawable/ic_add_to_favorite_23"
             app:layout_constraintEnd_toEndOf="@+id/right_guideline"
-            app:layout_constraintTop_toBottomOf="@id/artistName"
-            app:tint="@color/white" />
+            app:layout_constraintTop_toBottomOf="@id/artistName" />
 
         <TextView
             android:id="@+id/progressValue"
