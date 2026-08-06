@@ -34,23 +34,26 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavigationView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-
-            val isBottomNavigationVisible =
-                destination.id != R.id.playerFragment
-
-            binding.bottomNavigationView.isVisible =
-                isBottomNavigationVisible
-
-            binding.bottomNavigationDivider.isVisible =
-                isBottomNavigationVisible
+            updateBottomNavigationVisibility(
+                destinationId = destination.id,
+                isKeyboardVisible = false
+            )
         }
     }
 
     private fun setupInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { _, insets ->
-            val statusBars = insets.getInsets(WindowInsetsCompat.Type.statusBars())
-            val navigationBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
-            val isKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            val statusBars = insets.getInsets(
+                WindowInsetsCompat.Type.statusBars()
+            )
+
+            val navigationBars = insets.getInsets(
+                WindowInsetsCompat.Type.navigationBars()
+            )
+
+            val isKeyboardVisible = insets.isVisible(
+                WindowInsetsCompat.Type.ime()
+            )
 
             binding.navHostFragment.updatePadding(
                 top = statusBars.top
@@ -60,17 +63,43 @@ class MainActivity : AppCompatActivity() {
                 bottom = navigationBars.bottom
             )
 
-            binding.bottomNavigationView.isVisible =
-                !isKeyboardVisible && getCurrentDestinationId() != R.id.playerFragment
+            updateBottomNavigationVisibility(
+                destinationId = getCurrentDestinationId(),
+                isKeyboardVisible = isKeyboardVisible
+            )
 
             insets
         }
     }
 
+    private fun updateBottomNavigationVisibility(
+        destinationId: Int?,
+        isKeyboardVisible: Boolean
+    ) {
+        val isDestinationWithoutBottomNavigation =
+            destinationId == R.id.playerFragment ||
+                    destinationId == R.id.createPlaylistFragment
+
+        val isBottomNavigationVisible =
+            !isKeyboardVisible &&
+                    !isDestinationWithoutBottomNavigation
+
+        binding.bottomNavigationView.isVisible =
+            isBottomNavigationVisible
+
+        binding.bottomNavigationDivider.isVisible =
+            isBottomNavigationVisible
+    }
+
     private fun getCurrentDestinationId(): Int? {
         val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment) as? NavHostFragment
+            .findFragmentById(
+                R.id.nav_host_fragment
+            ) as? NavHostFragment
 
-        return navHostFragment?.navController?.currentDestination?.id
+        return navHostFragment
+            ?.navController
+            ?.currentDestination
+            ?.id
     }
 }
