@@ -43,12 +43,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { _, insets ->
-            val statusBars = insets.getInsets(
-                WindowInsetsCompat.Type.statusBars()
-            )
 
-            val navigationBars = insets.getInsets(
-                WindowInsetsCompat.Type.navigationBars()
+            val systemBars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars()
             )
 
             val isKeyboardVisible = insets.isVisible(
@@ -56,11 +53,11 @@ class MainActivity : AppCompatActivity() {
             )
 
             binding.navHostFragment.updatePadding(
-                top = statusBars.top
+                top = systemBars.top
             )
 
             binding.bottomNavigationView.updatePadding(
-                bottom = navigationBars.bottom
+                bottom = systemBars.bottom
             )
 
             updateBottomNavigationVisibility(

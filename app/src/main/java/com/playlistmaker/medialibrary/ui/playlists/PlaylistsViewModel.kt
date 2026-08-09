@@ -3,6 +3,7 @@ package com.playlistmaker.medialibrary.ui.playlists
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.playlistmaker.playlist.domain.PlaylistInteractor
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,12 +20,16 @@ class PlaylistsViewModel(
     val state: StateFlow<PlaylistsState> =
         _state.asStateFlow()
 
+    private var playlistsJob: Job? = null
+
     init {
         observePlaylists()
     }
 
     private fun observePlaylists() {
-        viewModelScope.launch {
+        playlistsJob?.cancel()
+
+        playlistsJob = viewModelScope.launch {
             playlistInteractor.getPlaylists()
                 .collect { playlists ->
                     _state.value = if (playlists.isEmpty()) {

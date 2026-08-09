@@ -25,7 +25,8 @@ class PlaylistViewHolder(
             )
 
         if (playlist.coverPath.isBlank()) {
-            Glide.with(binding.playlistCover).clear(binding.playlistCover)
+            Glide.with(binding.playlistCover)
+                .clear(binding.playlistCover)
 
             binding.playlistCover.scaleType =
                 android.widget.ImageView.ScaleType.CENTER
@@ -35,7 +36,7 @@ class PlaylistViewHolder(
             )
         } else {
             binding.playlistCover.scaleType =
-                android.widget.ImageView.ScaleType.CENTER_INSIDE
+                android.widget.ImageView.ScaleType.CENTER_CROP
 
             Glide.with(binding.playlistCover)
                 .load(File(playlist.coverPath))

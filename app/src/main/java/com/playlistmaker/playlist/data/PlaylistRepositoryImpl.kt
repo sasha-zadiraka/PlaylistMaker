@@ -8,6 +8,7 @@ import com.playlistmaker.playlist.domain.Playlist
 import com.playlistmaker.playlist.domain.PlaylistRepository
 import com.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 class PlaylistRepositoryImpl(
@@ -34,6 +35,7 @@ class PlaylistRepositoryImpl(
 
     override fun getPlaylists(): Flow<List<Playlist>> {
         return playlistDao.getPlaylists()
+            .distinctUntilChanged()
             .map { playlistEntities ->
                 playlistEntities.map { entity ->
                     converter.map(entity)
