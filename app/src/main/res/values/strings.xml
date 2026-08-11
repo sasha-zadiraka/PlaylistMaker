@@ -33,6 +33,10 @@
     <string name="screen_player_track_genre">Жанр</string>
     <string name="screen_player_track_country">Страна</string>
     <string name="screen_player_title">Аудиоплеер</string>
+    <string name="screen_player_add_to_playlist_title">Добавить в плейлист</string>
+    <string name="screen_player_track_added_to_playlist">Добавлено в плейлист %1$s</string>
+    <string name="screen_player_track_already_added_to_playlist">Трек уже добавлен в плейлист %1$s</string>
+    <string name="screen_player_track_add_error">Не удалось добавить трек в плейлист</string>
 
     // media library screen
     <string name="screen_media_library_title">Медиатека</string>
@@ -41,4 +45,24 @@
     <string name="screen_media_library_empty_tracks_response">Ваша медиатека пуста</string>
     <string name="screen_media_library_empty_playlist_response">Вы не создали\n ни одного плейлиста</string>
     <string name="screen_media_library_new_playlist_button">Новый плейлист</string>
+
+    // playlist screen
+    <plurals name="screen_playlist_tracks_count">
+        <item quantity="one">%d трек</item>
+        <item quantity="few">%d трека</item>
+        <item quantity="many">%d треков</item>
+        <item quantity="other">%d треков</item>
+    </plurals>
+
+    // new playlist screen
+    <string name="new_playlist_create_button">Создать</string>
+    <string name="new_playlist_description">Описание</string>
+    <string name="new_playlist_name">Название*</string>
+    <string name="new_playlist_screen_title">Новый плейлист</string>
+    <string name="new_playlist_created_toast">Плейлист %1$s создан</string>
+    <string name="new_playlist_creation_error">Не удалось создать плейлист</string>
+    <string name="new_playlist_exit_dialog_title">Завершить создание плейлиста?</string>
+    <string name="new_playlist_exit_dialog_message">Все несохраненные данные будут потеряны</string>
+    <string name="new_playlist_exit_dialog_cancel">Отмена</string>
+    <string name="new_playlist_exit_dialog_finish">Завершить</string>
 </resources>

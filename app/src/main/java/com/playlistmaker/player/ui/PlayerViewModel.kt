@@ -6,22 +6,39 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.playlistmaker.medialibrary.domain.FavoriteTracksInteractor
 import com.playlistmaker.player.domain.PlayerInteractor
+import com.playlistmaker.playlist.domain.Playlist
+import com.playlistmaker.playlist.domain.PlaylistInteractor
 import com.playlistmaker.search.domain.models.Track
 import com.playlistmaker.util.AppConstants.PLAYER_PROGRESS_UPDATE_DELAY
 import com.playlistmaker.util.AppConstants.ZERO_TIME
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class PlayerViewModel(
     private val playerInteractor: PlayerInteractor,
-    private val favoriteTracksInteractor: FavoriteTracksInteractor
+    private val favoriteTracksInteractor: FavoriteTracksInteractor,
+    private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
     private val stateLiveData = MutableLiveData(PlayerState())
+
     fun observeState(): LiveData<PlayerState> = stateLiveData
+
+    private val playlistsLiveData =
+        MutableLiveData<List<Playlist>>(emptyList())
+
+    fun observePlaylists(): LiveData<List<Playlist>> =
+        playlistsLiveData
+
+    private val addTrackResultLiveData =
+        MutableLiveData<AddTrackToPlaylistResult>()
+
+    fun observeAddTrackResult(): LiveData<AddTrackToPlaylistResult> =
+        addTrackResultLiveData
 
     private var currentTrack: Track? = null
 
@@ -33,6 +50,48 @@ class PlayerViewModel(
         stateLiveData.value = stateLiveData.value?.copy(
             isFavorite = track.isFavorite
         )
+    }
+
+    fun loadPlaylists() {
+        viewModelScope.launch {
+            val playlists = playlistInteractor
+                .getPlaylists()
+                .first()
+
+            playlistsLiveData.value = playlists
+        }
+    }
+
+    fun addTrackToPlaylist(playlist: Playlist) {
+        val track = currentTrack ?: return
+
+        if (playlist.trackIds.contains(track.trackId)) {
+            addTrackResultLiveData.value =
+                AddTrackToPlaylistResult.AlreadyAdded(
+                    playlistName = playlist.name
+                )
+
+            return
+        }
+
+        viewModelScope.launch {
+            runCatching {
+                playlistInteractor.addTrackToPlaylist(
+                    track = track,
+                    playlist = playlist
+                )
+            }
+                .onSuccess {
+                    addTrackResultLiveData.value =
+                        AddTrackToPlaylistResult.Added(
+                            playlistName = playlist.name
+                        )
+                }
+                .onFailure {
+                    addTrackResultLiveData.value =
+                        AddTrackToPlaylistResult.Error
+                }
+        }
     }
 
     fun onFavoriteClicked() {
@@ -67,6 +126,7 @@ class PlayerViewModel(
             },
             onCompletion = {
                 stopProgressUpdate()
+
                 stateLiveData.postValue(
                     stateLiveData.value?.copy(
                         isPrepared = true,
@@ -79,9 +139,12 @@ class PlayerViewModel(
     }
 
     fun playbackControl() {
-        val currentState = stateLiveData.value ?: PlayerState()
+        val currentState =
+            stateLiveData.value ?: PlayerState()
 
-        if (!currentState.isPrepared) return
+        if (!currentState.isPrepared) {
+            return
+        }
 
         if (currentState.isPlaying) {
             pausePlayer()
@@ -114,10 +177,13 @@ class PlayerViewModel(
 
         progressJob = viewModelScope.launch {
             while (playerInteractor.isPlaying()) {
-                stateLiveData.value = stateLiveData.value?.copy(
-                    isPlaying = true,
-                    progress = formatTime(playerInteractor.getCurrentPosition())
-                )
+                stateLiveData.value =
+                    stateLiveData.value?.copy(
+                        isPlaying = true,
+                        progress = formatTime(
+                            playerInteractor.getCurrentPosition()
+                        )
+                    )
 
                 delay(PLAYER_PROGRESS_UPDATE_DELAY)
             }
@@ -138,6 +204,7 @@ class PlayerViewModel(
 
     override fun onCleared() {
         super.onCleared()
+
         stopProgressUpdate()
         playerInteractor.release()
     }
