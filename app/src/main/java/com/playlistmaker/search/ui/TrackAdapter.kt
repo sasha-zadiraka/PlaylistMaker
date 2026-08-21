@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.playlistmaker.search.domain.models.Track
 
 class TrackAdapter(
+    private val onTrackLongClick: (Track) -> Unit = {},
     private val onTrackClick: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackViewHolder>() {
 
@@ -21,7 +22,7 @@ class TrackAdapter(
         holder: TrackViewHolder,
         position: Int
     ) {
-        holder.bind(tracks[position], onTrackClick)
+        holder.bind(tracks[position], onTrackClick, onTrackLongClick)
     }
 
     override fun getItemCount(): Int = tracks.size

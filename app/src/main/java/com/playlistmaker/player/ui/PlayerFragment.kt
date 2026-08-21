@@ -20,6 +20,8 @@ import com.playlistmaker.search.domain.models.getCoverArtwork
 import com.playlistmaker.util.AppConstants.TRACK_KEY
 import com.playlistmaker.util.AppConstants.ZERO_TIME
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class PlayerFragment : Fragment() {
 
@@ -239,7 +241,12 @@ class PlayerFragment : Fragment() {
         binding.trackName.text = track.trackName
         binding.artistName.text = track.artistName
         binding.progressValue.text = ZERO_TIME
-        binding.durationValue.text = track.trackTime
+
+        binding.durationValue.text = SimpleDateFormat(
+            "mm:ss",
+            Locale.getDefault()
+        ).format(track.trackTimeMillis)
+
         binding.genreValue.text = track.primaryGenreName
         binding.countryValue.text = track.country
 

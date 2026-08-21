@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class CreatePlaylistViewModel(
-    private val interactor: PlaylistInteractor
+open class CreatePlaylistViewModel(
+    protected val interactor: PlaylistInteractor
 ) : ViewModel() {
 
-    private val _state =
+    protected val _state =
         MutableStateFlow<CreatePlaylistState>(
             CreatePlaylistState.Editing
         )
@@ -33,7 +33,7 @@ class CreatePlaylistViewModel(
     val isCreateButtonEnabled: Boolean
         get() = playlistName.isNotBlank()
 
-    val hasUnsavedData: Boolean
+    open val hasUnsavedData: Boolean
         get() = playlistName.isNotBlank() ||
                 playlistDescription.isNotBlank() ||
                 selectedCoverUri != null
@@ -50,7 +50,7 @@ class CreatePlaylistViewModel(
         selectedCoverUri = uri
     }
 
-    fun createPlaylist() {
+    open fun createPlaylist() {
         val name = playlistName.trim()
 
         if (name.isEmpty()) {

@@ -25,7 +25,20 @@ class PlaylistsFragment : Fragment() {
 
     private val viewModel by viewModel<PlaylistsViewModel>()
 
-    private val playlistAdapter = PlaylistAdapter()
+    private val playlistAdapter = PlaylistAdapter(
+        onPlaylistClick = { playlist ->
+            val bundle = Bundle().apply {
+                putLong("playlistId", playlist.id)
+            }
+
+            requireParentFragment()
+                .findNavController()
+                .navigate(
+                    R.id.action_mediaLibraryFragment_to_playlistInfoFragment,
+                    bundle
+                )
+        }
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -21,15 +21,15 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class CreatePlaylistFragment :
+open class CreatePlaylistFragment :
     Fragment(R.layout.fragment_create_playlist) {
 
     private var _binding: FragmentCreatePlaylistBinding? = null
 
-    private val binding: FragmentCreatePlaylistBinding
+    protected val binding: FragmentCreatePlaylistBinding
         get() = requireNotNull(_binding)
 
-    private val viewModel: CreatePlaylistViewModel by viewModel()
+    protected open val viewModel: CreatePlaylistViewModel by viewModel()
 
     private val imagePickerLauncher = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
@@ -108,7 +108,7 @@ class CreatePlaylistFragment :
         )
     }
 
-    private fun showCover(uri: Uri) {
+    protected fun showCover(uri: Uri) {
         binding.coverImage.isVisible = true
         binding.addCoverImage.isVisible = false
 
@@ -135,7 +135,7 @@ class CreatePlaylistFragment :
         }
     }
 
-    private fun renderState(state: CreatePlaylistState) {
+    protected open fun renderState(state: CreatePlaylistState) {
         when (state) {
             CreatePlaylistState.Editing -> {
                 updateCreateButton()

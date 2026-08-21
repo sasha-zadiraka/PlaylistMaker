@@ -35,8 +35,12 @@ class PlayerRepositoryImpl : PlayerRepository {
     }
 
     override fun release() {
-        mediaPlayer?.release()
+        val player = mediaPlayer
         mediaPlayer = null
+
+        player?.let {
+            Thread { it.release() }.start()
+        }
     }
 
     override fun getCurrentPosition(): Int {

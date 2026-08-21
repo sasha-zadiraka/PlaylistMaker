@@ -5,6 +5,8 @@ import com.playlistmaker.medialibrary.ui.favorites.FavoriteTracksViewModel
 import com.playlistmaker.medialibrary.ui.playlists.PlaylistsViewModel
 import com.playlistmaker.player.ui.PlayerViewModel
 import com.playlistmaker.playlist.ui.CreatePlaylistViewModel
+import com.playlistmaker.playlist.ui.EditPlaylistViewModel
+import com.playlistmaker.playlist.ui.PlaylistInfoViewModel
 import com.playlistmaker.search.ui.SearchViewModel
 import com.playlistmaker.settings.ui.SettingsViewModel
 import org.koin.core.module.dsl.viewModel
@@ -53,6 +55,19 @@ val viewModelModule = module {
     viewModel {
         CreatePlaylistViewModel(
             interactor = get()
+        )
+    }
+
+    viewModel {
+        EditPlaylistViewModel(
+            interactor = get()
+        )
+    }
+
+    viewModel {
+        PlaylistInfoViewModel(
+            playlistInteractor = get(),
+            sharingInteractor = get()
         )
     }
 }

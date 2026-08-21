@@ -88,6 +88,27 @@
         <item name="android:tint">?attr/colorAccent</item>
     </style>
 
+    <style name="MenuBottomSheetItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">61dp</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">@dimen/big_padding</item>
+        <item name="android:paddingEnd">@dimen/big_padding</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textSize">@dimen/secondary_text_size</item>
+    </style>
+
+    <style name="ThemeOverlay.PlaylistMaker.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="colorPrimary">@color/yp_blue</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/yp_black</item>
+        <item name="android:backgroundDimAmount">0.502</item>
+    </style>
+
     <style name="MediaLibraryTabText">
         <item name="android:textSize">14sp</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>

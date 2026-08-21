@@ -13,6 +13,10 @@ class SharingInteractorImpl(
         externalNavigator.shareLink(sharingData.shareAppLink)
     }
 
+    override fun shareText(text: String) {
+        externalNavigator.shareLink(text)
+    }
+
     override fun openTerms() {
         externalNavigator.openLink(sharingData.userAgreementLink)
     }
