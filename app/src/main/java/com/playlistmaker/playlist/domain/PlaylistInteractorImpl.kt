@@ -78,8 +78,8 @@ class PlaylistInteractorImpl(
         return repository.getPlaylistById(playlistId)
     }
 
-    override suspend fun deletePlaylist(playlist: Playlist) {
-        repository.deletePlaylist(playlist)
+    override suspend fun deletePlaylist(playlistId: Long) {
+        repository.deletePlaylist(playlistId)
     }
 
     override fun getTracks(

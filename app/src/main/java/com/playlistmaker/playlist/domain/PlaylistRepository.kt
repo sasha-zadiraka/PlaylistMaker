@@ -29,5 +29,5 @@ interface PlaylistRepository {
         playlistId: Long
     ): Flow<Playlist?>
 
-    suspend fun deletePlaylist(playlist: Playlist)
+    suspend fun deletePlaylist(playlistId: Long)
 }

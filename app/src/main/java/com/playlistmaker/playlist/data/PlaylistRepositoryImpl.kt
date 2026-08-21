@@ -114,10 +114,13 @@ class PlaylistRepositoryImpl(
             }
     }
 
-    override suspend fun deletePlaylist(playlist: Playlist) {
-        playlistDao.deletePlaylist(playlist.id)
+    override suspend fun deletePlaylist(playlistId: Long) {
+        val entity = playlistDao.getPlaylistById(playlistId).first()
+        val trackIds = entity?.let { converter.map(it).trackIds } ?: emptyList()
 
-        playlist.trackIds.forEach { trackId ->
+        playlistDao.deletePlaylist(playlistId)
+
+        trackIds.forEach { trackId ->
             deleteTrackIfNotInAnyPlaylist(trackId)
         }
     }

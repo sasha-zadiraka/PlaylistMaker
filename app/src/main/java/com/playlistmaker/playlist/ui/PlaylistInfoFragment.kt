@@ -260,27 +260,36 @@ class PlaylistInfoFragment : Fragment() {
 
     private fun buildShareText(content: PlaylistInfoState.Content): String {
         val playlist = content.playlist
-        val lines = mutableListOf(playlist.name)
+        val durationFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
 
-        if (playlist.description.isNotBlank()) {
-            lines += playlist.description
+        return buildString {
+            append(playlist.name)
+
+            if (playlist.description.isNotBlank()) {
+                append('\n')
+                append(playlist.description)
+            }
+
+            append('\n')
+            append(
+                getString(
+                    R.string.screen_playlist_share_tracks_count,
+                    playlist.trackCount
+                )
+            )
+
+            content.tracks.forEachIndexed { index, track ->
+                append('\n')
+                append(index + 1)
+                append(". ")
+                append(track.artistName)
+                append(" - ")
+                append(track.trackName)
+                append(" (")
+                append(durationFormat.format(track.trackTimeMillis))
+                append(')')
+            }
         }
-
-        lines += getString(
-            R.string.screen_playlist_share_tracks_count,
-            playlist.trackCount
-        )
-
-        content.tracks.forEachIndexed { index, track ->
-            val duration = SimpleDateFormat(
-                "mm:ss",
-                Locale.getDefault()
-            ).format(track.trackTimeMillis)
-
-            lines += "${index + 1}. ${track.artistName} - ${track.trackName} ($duration)"
-        }
-
-        return lines.joinToString(separator = "\n")
     }
 
     private fun showDeletePlaylistDialog() {

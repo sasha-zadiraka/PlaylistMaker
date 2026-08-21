@@ -83,7 +83,7 @@ class PlaylistInfoViewModel(
         }
 
         viewModelScope.launch {
-            playlistInteractor.deletePlaylist(currentState.playlist)
+            playlistInteractor.deletePlaylist(currentState.playlist.id)
             onDeleted()
         }
     }
