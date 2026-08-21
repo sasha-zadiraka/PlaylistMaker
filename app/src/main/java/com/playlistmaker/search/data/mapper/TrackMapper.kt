@@ -6,16 +6,13 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 fun TrackDto.toTrack(): Track {
-    val formattedTrackTime = SimpleDateFormat("mm:ss", Locale.getDefault())
-        .format(trackTimeMillis ?: 0L)
-
     val formattedReleaseYear = releaseDate?.take(4) ?: ""
 
     return Track(
         trackId = trackId ?: 0L,
         trackName = trackName.orEmpty(),
         artistName = artistName.orEmpty(),
-        trackTime = formattedTrackTime,
+        trackTimeMillis = trackTimeMillis ?: 0L,
         artworkUrl100 = artworkUrl100.orEmpty(),
         collectionName = collectionName.orEmpty(),
         releaseDate = formattedReleaseYear,

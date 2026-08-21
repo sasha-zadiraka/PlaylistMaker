@@ -32,9 +32,20 @@ class PlaylistInteractorImpl(
     }
 
     override suspend fun updatePlaylist(
-        playlist: Playlist
+        playlist: Playlist,
+        coverUri: Uri?
     ) {
-        repository.updatePlaylist(playlist)
+        val coverPath = coverUri
+            ?.let { uri -> imageRepository.saveImage(uri) }
+            ?: playlist.coverPath
+
+        repository.updatePlaylist(
+            playlist.copy(
+                name = playlist.name.trim(),
+                description = playlist.description.trim(),
+                coverPath = coverPath
+            )
+        )
     }
 
     override fun getPlaylists(): Flow<List<Playlist>> {
@@ -49,5 +60,31 @@ class PlaylistInteractorImpl(
             track = track,
             playlist = playlist
         )
+    }
+
+    override suspend fun removeTrackFromPlaylist(
+        trackId: Long,
+        playlist: Playlist
+    ) {
+        repository.removeTrackFromPlaylist(
+            trackId = trackId,
+            playlist = playlist
+        )
+    }
+
+    override fun getPlaylistById(
+        playlistId: Long
+    ): Flow<Playlist?> {
+        return repository.getPlaylistById(playlistId)
+    }
+
+    override suspend fun deletePlaylist(playlist: Playlist) {
+        repository.deletePlaylist(playlist)
+    }
+
+    override fun getTracks(
+        trackIds: List<Long>
+    ): Flow<List<Track>> {
+        return repository.getTracks(trackIds)
     }
 }

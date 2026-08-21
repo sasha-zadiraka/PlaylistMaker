@@ -1,5 +1,7 @@
 package com.playlistmaker.main.ui
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -10,8 +12,20 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityMainBinding
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        val locale = Locale("ru")
+
+        val configuration = Configuration(newBase.resources.configuration)
+        configuration.setLocale(locale)
+
+        super.attachBaseContext(
+            newBase.createConfigurationContext(configuration)
+        )
+    }
 
     private lateinit var binding: ActivityMainBinding
 
@@ -75,7 +89,9 @@ class MainActivity : AppCompatActivity() {
     ) {
         val isDestinationWithoutBottomNavigation =
             destinationId == R.id.playerFragment ||
-                    destinationId == R.id.createPlaylistFragment
+                    destinationId == R.id.createPlaylistFragment ||
+                    destinationId == R.id.playlistInfoFragment ||
+                    destinationId == R.id.editPlaylistFragment
 
         val isBottomNavigationVisible =
             !isKeyboardVisible &&

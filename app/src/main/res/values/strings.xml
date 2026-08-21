@@ -47,12 +47,30 @@
     <string name="screen_media_library_new_playlist_button">Новый плейлист</string>
 
     // playlist screen
+    <string name="screen_playlist_title">Плейлист</string>
+    <string name="screen_playlist_duration_and_tracks">%1$s • %2$s</string>
+    <plurals name="screen_playlist_duration_minutes">
+        <item quantity="one">%d минута</item>
+        <item quantity="few">%d минуты</item>
+        <item quantity="many">%d минут</item>
+        <item quantity="other">%d минут</item>
+    </plurals>
     <plurals name="screen_playlist_tracks_count">
         <item quantity="one">%d трек</item>
         <item quantity="few">%d трека</item>
         <item quantity="many">%d треков</item>
         <item quantity="other">%d треков</item>
     </plurals>
+    <string name="screen_playlist_tracks_empty">В этом плейлисте нет треков</string>
+    <string name="screen_playlist_remove_track_dialog_message">Хотите удалить трек?</string>
+    <string name="screen_playlist_remove_track_dialog_negative">Нет</string>
+    <string name="screen_playlist_remove_track_dialog_positive">Да</string>
+    <string name="screen_playlist_share_empty">В этом плейлисте нет списка треков, которым можно поделиться</string>
+    <string name="screen_playlist_share_tracks_count">%d треков</string>
+    <string name="screen_playlist_menu_share">Поделиться</string>
+    <string name="screen_playlist_menu_edit">Редактировать информацию</string>
+    <string name="screen_playlist_menu_delete">Удалить плейлист</string>
+    <string name="screen_playlist_delete_dialog_message">Хотите удалить плейлист «%1$s»?</string>
 
     // new playlist screen
     <string name="new_playlist_create_button">Создать</string>
@@ -65,4 +83,8 @@
     <string name="new_playlist_exit_dialog_message">Все несохраненные данные будут потеряны</string>
     <string name="new_playlist_exit_dialog_cancel">Отмена</string>
     <string name="new_playlist_exit_dialog_finish">Завершить</string>
+
+    // edit playlist screen
+    <string name="edit_playlist_screen_title">Редактировать</string>
+    <string name="edit_playlist_save_button">Сохранить</string>
 </resources>

@@ -9,6 +9,7 @@ import com.playlistmaker.playlist.domain.PlaylistRepository
 import com.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class PlaylistRepositoryImpl(
@@ -51,7 +52,7 @@ class PlaylistRepositoryImpl(
             trackId = track.trackId,
             trackName = track.trackName,
             artistName = track.artistName,
-            trackTime = track.trackTime,
+            trackTimeMillis = track.trackTimeMillis,
             artworkUrl100 = track.artworkUrl100,
             collectionName = track.collectionName,
             releaseDate = track.releaseDate,
@@ -73,5 +74,82 @@ class PlaylistRepositoryImpl(
         playlistDao.updatePlaylist(
             converter.map(updatedPlaylist)
         )
+    }
+
+    override suspend fun removeTrackFromPlaylist(
+        trackId: Long,
+        playlist: Playlist
+    ) {
+        val updatedPlaylist = playlist.copy(
+            trackIds = playlist.trackIds - trackId,
+            trackCount = playlist.trackCount - 1
+        )
+
+        playlistDao.updatePlaylist(
+            converter.map(updatedPlaylist)
+        )
+
+        deleteTrackIfNotInAnyPlaylist(trackId)
+    }
+
+    private suspend fun deleteTrackIfNotInAnyPlaylist(trackId: Long) {
+        val isTrackUsed = playlistDao.getPlaylists()
+            .first()
+            .any { entity ->
+                trackId in converter.map(entity).trackIds
+            }
+
+        if (!isTrackUsed) {
+            playlistTrackDao.deleteTrack(trackId)
+        }
+    }
+
+    override fun getPlaylistById(
+        playlistId: Long
+    ): Flow<Playlist?> {
+        return playlistDao.getPlaylistById(playlistId)
+            .distinctUntilChanged()
+            .map { entity ->
+                entity?.let { converter.map(it) }
+            }
+    }
+
+    override suspend fun deletePlaylist(playlist: Playlist) {
+        playlistDao.deletePlaylist(playlist.id)
+
+        playlist.trackIds.forEach { trackId ->
+            deleteTrackIfNotInAnyPlaylist(trackId)
+        }
+    }
+
+    override fun getTracks(
+        trackIds: List<Long>
+    ): Flow<List<Track>> {
+        return playlistTrackDao.getTracks()
+            .distinctUntilChanged()
+            .map { entities ->
+                entities
+                    .filter { entity ->
+                        entity.trackId in trackIds
+                    }
+                    .sortedByDescending { entity ->
+                        entity.addedAt
+                    }
+                    .map { entity ->
+                        Track(
+                            trackId = entity.trackId,
+                            trackName = entity.trackName,
+                            artistName = entity.artistName,
+                            trackTimeMillis = entity.trackTimeMillis,
+                            artworkUrl100 = entity.artworkUrl100,
+                            collectionName = entity.collectionName,
+                            releaseDate = entity.releaseDate,
+                            primaryGenreName = entity.primaryGenreName,
+                            country = entity.country,
+                            previewUrl = entity.previewUrl,
+                            isFavorite = false
+                        )
+                    }
+            }
     }
 }

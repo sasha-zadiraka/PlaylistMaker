@@ -44,6 +44,78 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
     }
 }
 
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        migrateTrackTimeColumn(db, tableName = "favorite_tracks")
+        migrateTrackTimeColumn(db, tableName = "playlist_tracks")
+    }
+
+    private fun migrateTrackTimeColumn(
+        db: SupportSQLiteDatabase,
+        tableName: String
+    ) {
+        val newTableName = "${tableName}_new"
+
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS $newTableName (
+                trackId INTEGER NOT NULL,
+                trackName TEXT NOT NULL,
+                artistName TEXT NOT NULL,
+                trackTimeMillis INTEGER NOT NULL,
+                artworkUrl100 TEXT NOT NULL,
+                collectionName TEXT NOT NULL,
+                releaseDate TEXT NOT NULL,
+                primaryGenreName TEXT NOT NULL,
+                country TEXT NOT NULL,
+                previewUrl TEXT NOT NULL,
+                addedAt INTEGER NOT NULL,
+                PRIMARY KEY(trackId)
+            )
+            """.trimIndent()
+        )
+
+        val trackTimeMillisSelector = if (hasColumn(db, tableName, "trackTime")) {
+            """
+            (CAST(substr(trackTime, 1, instr(trackTime, ':') - 1) AS INTEGER) * 60 +
+             CAST(substr(trackTime, instr(trackTime, ':') + 1) AS INTEGER)) * 1000
+            """.trimIndent()
+        } else {
+            "0"
+        }
+
+        db.execSQL(
+            """
+            INSERT INTO $newTableName
+            SELECT trackId, trackName, artistName, $trackTimeMillisSelector,
+                artworkUrl100, collectionName, releaseDate, primaryGenreName, country, previewUrl, addedAt
+            FROM $tableName
+            """.trimIndent()
+        )
+
+        db.execSQL("DROP TABLE $tableName")
+        db.execSQL("ALTER TABLE $newTableName RENAME TO $tableName")
+    }
+
+    private fun hasColumn(
+        db: SupportSQLiteDatabase,
+        tableName: String,
+        columnName: String
+    ): Boolean {
+        db.query("PRAGMA table_info($tableName)").use { cursor ->
+            val nameColumnIndex = cursor.getColumnIndex("name")
+
+            while (cursor.moveToNext()) {
+                if (cursor.getString(nameColumnIndex) == columnName) {
+                    return true
+                }
+            }
+        }
+
+        return false
+    }
+}
+
 private val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL(
@@ -101,7 +173,7 @@ val dataModule = module {
             AppDatabase::class.java,
             "playlistmaker.db"
         )
-            .addMigrations(MIGRATION_2_3)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
             .build()
     }
 

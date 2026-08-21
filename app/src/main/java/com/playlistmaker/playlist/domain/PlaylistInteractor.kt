@@ -13,7 +13,8 @@ interface PlaylistInteractor {
     ): Long
 
     suspend fun updatePlaylist(
-        playlist: Playlist
+        playlist: Playlist,
+        coverUri: Uri?
     )
 
     fun getPlaylists(): Flow<List<Playlist>>
@@ -22,4 +23,19 @@ interface PlaylistInteractor {
         track: Track,
         playlist: Playlist
     )
+
+    suspend fun removeTrackFromPlaylist(
+        trackId: Long,
+        playlist: Playlist
+    )
+
+    fun getPlaylistById(
+        playlistId: Long
+    ): Flow<Playlist?>
+
+    suspend fun deletePlaylist(playlist: Playlist)
+
+    fun getTracks(
+        trackIds: List<Long>
+    ): Flow<List<Track>>
 }
