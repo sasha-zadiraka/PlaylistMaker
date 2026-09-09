@@ -279,15 +279,8 @@ class PlayerFragment : Fragment() {
     private fun render(state: PlayerState) {
         binding.progressValue.text = state.progress
 
-        if (state.isPlaying) {
-            binding.buttonPlay.setImageResource(
-                R.drawable.ic_pause_83
-            )
-        } else {
-            binding.buttonPlay.setImageResource(
-                R.drawable.ic_play_83
-            )
-        }
+        binding.buttonPlay.isEnabled = state.isPrepared
+        binding.buttonPlay.setPlaying(state.isPlaying)
 
         if (state.isFavorite) {
             binding.buttonFavorite.setImageResource(
