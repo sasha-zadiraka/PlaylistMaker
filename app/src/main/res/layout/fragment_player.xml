@@ -97,17 +97,17 @@
                 app:layout_constraintTop_toBottomOf="@id/artistName"
                 app:tint="@color/white" />
 
-            <ImageButton
+            <com.playlistmaker.player.ui.PlaybackButtonView
                 android:id="@+id/buttonPlay"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_marginTop="18dp"
-                android:background="@null"
                 android:padding="28dp"
-                android:src="@drawable/ic_play_83"
+                app:layout_constraintBottom_toBottomOf="@id/buttonFavorite"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/artistName" />
+                app:layout_constraintTop_toTopOf="@id/buttonFavorite"
+                app:pauseIcon="@drawable/ic_pause_83"
+                app:playIcon="@drawable/ic_play_83" />
 
             <ImageButton
                 android:id="@+id/buttonFavorite"
