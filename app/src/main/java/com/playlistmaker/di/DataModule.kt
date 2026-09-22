@@ -7,8 +7,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.gson.Gson
 import com.playlistmaker.data.db.AppDatabase
 import com.playlistmaker.data.db.TrackDao
-import com.playlistmaker.player.data.PlayerRepositoryImpl
-import com.playlistmaker.player.domain.PlayerRepository
 import com.playlistmaker.playlist.data.db.PlaylistDao
 import com.playlistmaker.search.data.network.ItunesApi
 import com.playlistmaker.sharing.data.ExternalNavigatorImpl
@@ -161,10 +159,6 @@ val dataModule = module {
 
     single<ExternalNavigator> {
         ExternalNavigatorImpl(androidContext())
-    }
-
-    factory<PlayerRepository> {
-        PlayerRepositoryImpl()
     }
 
     single {

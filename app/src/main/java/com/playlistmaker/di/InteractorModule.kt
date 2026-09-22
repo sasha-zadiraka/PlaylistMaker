@@ -3,8 +3,6 @@ package com.playlistmaker.di
 import com.example.playlistmaker.R
 import com.playlistmaker.medialibrary.domain.FavoriteTracksInteractor
 import com.playlistmaker.medialibrary.domain.FavoriteTracksInteractorImpl
-import com.playlistmaker.player.domain.PlayerInteractor
-import com.playlistmaker.player.domain.PlayerInteractorImpl
 import com.playlistmaker.playlist.domain.PlaylistInteractor
 import com.playlistmaker.playlist.domain.PlaylistInteractorImpl
 import com.playlistmaker.search.domain.SearchHistoryInteractor
@@ -32,10 +30,6 @@ val interactorModule = module {
 
     single<ThemeInteractor> {
         ThemeInteractorImpl(get())
-    }
-
-    single<PlayerInteractor> {
-        PlayerInteractorImpl(get())
     }
 
     single<SharingData> {

@@ -1,11 +1,21 @@
 package com.playlistmaker.player.ui
 
+import android.Manifest
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -14,6 +24,7 @@ import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.playlistmaker.player.service.PlaybackService
 import com.playlistmaker.playlist.domain.Playlist
 import com.playlistmaker.search.domain.models.Track
 import com.playlistmaker.search.domain.models.getCoverArtwork
@@ -34,6 +45,23 @@ class PlayerFragment : Fragment() {
             BottomSheetBehavior<LinearLayout>
 
     private var shouldOpenBottomSheet = false
+
+    private var isServiceBound = false
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName, service: IBinder) {
+            val binder = service as PlaybackService.PlaybackBinder
+            viewModel.attachService(binder.getService())
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            viewModel.detachService()
+        }
+    }
+
+    private val requestNotificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { }
 
     private val playlistAdapter = PlaylistBottomSheetAdapter(
         onPlaylistClick = ::onPlaylistClicked
@@ -103,8 +131,47 @@ class PlayerFragment : Fragment() {
         track?.let {
             fillData(it)
             viewModel.setTrack(it)
-            viewModel.preparePlayer(it.previewUrl)
+            bindPlaybackService(it)
         }
+
+        requestNotificationPermissionIfNeeded()
+    }
+
+    private fun bindPlaybackService(track: Track) {
+        val intent = Intent(requireContext(), PlaybackService::class.java).apply {
+            putExtra(PlaybackService.EXTRA_PREVIEW_URL, track.previewUrl)
+            putExtra(PlaybackService.EXTRA_ARTIST_NAME, track.artistName)
+            putExtra(PlaybackService.EXTRA_TRACK_NAME, track.trackName)
+        }
+
+        isServiceBound = requireContext().bindService(
+            intent,
+            serviceConnection,
+            Context.BIND_AUTO_CREATE
+        )
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return
+        }
+
+        if (!hasNotificationPermission()) {
+            requestNotificationPermissionLauncher.launch(
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+        }
+    }
+
+    private fun hasNotificationPermission(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return true
+        }
+
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun setupBottomSheet() {
@@ -293,9 +360,20 @@ class PlayerFragment : Fragment() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.pausePlayer()
+    override fun onStart() {
+        super.onStart()
+
+        if (hasNotificationPermission()) {
+            viewModel.onAppForegrounded()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        if (hasNotificationPermission()) {
+            viewModel.onAppBackgrounded()
+        }
     }
 
     override fun onDestroyView() {
@@ -304,6 +382,13 @@ class PlayerFragment : Fragment() {
                 bottomSheetCallback
             )
         }
+
+        if (isServiceBound) {
+            requireContext().unbindService(serviceConnection)
+            isServiceBound = false
+        }
+
+        viewModel.detachService()
 
         binding.playlistsRecyclerView.adapter = null
         _binding = null
