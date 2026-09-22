@@ -37,6 +37,8 @@
     <string name="screen_player_track_added_to_playlist">Добавлено в плейлист %1$s</string>
     <string name="screen_player_track_already_added_to_playlist">Трек уже добавлен в плейлист %1$s</string>
     <string name="screen_player_track_add_error">Не удалось добавить трек в плейлист</string>
+    <string name="playback_notification_channel_name">Воспроизведение трека</string>
+    <string name="playback_notification_track_info">%1$s - %2$s</string>
 
     // media library screen
     <string name="screen_media_library_title">Медиатека</string>
