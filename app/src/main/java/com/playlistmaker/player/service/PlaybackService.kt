@@ -22,6 +22,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -67,12 +68,12 @@ class PlaybackService : Service(), PlaybackServiceContract {
             setDataSource(previewUrl)
 
             setOnPreparedListener {
-                stateFlow.value = PlaybackState(status = PlaybackStatus.PREPARED)
+                stateFlow.update { PlaybackState(status = PlaybackStatus.PREPARED) }
             }
 
             setOnCompletionListener {
                 progressJob?.cancel()
-                stateFlow.value = PlaybackState(status = PlaybackStatus.COMPLETED)
+                stateFlow.update { PlaybackState(status = PlaybackStatus.COMPLETED) }
                 hideNotification()
             }
 
@@ -91,7 +92,7 @@ class PlaybackService : Service(), PlaybackServiceContract {
     override fun play() {
         mediaPlayer?.start()
 
-        stateFlow.value = stateFlow.value.copy(status = PlaybackStatus.PLAYING)
+        stateFlow.update { it.copy(status = PlaybackStatus.PLAYING) }
 
         startProgressUpdates()
     }
@@ -100,7 +101,7 @@ class PlaybackService : Service(), PlaybackServiceContract {
         mediaPlayer?.pause()
         progressJob?.cancel()
 
-        stateFlow.value = stateFlow.value.copy(status = PlaybackStatus.PAUSED)
+        stateFlow.update { it.copy(status = PlaybackStatus.PAUSED) }
     }
 
     private fun startProgressUpdates() {
@@ -108,9 +109,9 @@ class PlaybackService : Service(), PlaybackServiceContract {
 
         progressJob = serviceScope.launch {
             while (isActive) {
-                stateFlow.value = stateFlow.value.copy(
-                    progress = mediaPlayer?.currentPosition ?: 0
-                )
+                stateFlow.update {
+                    it.copy(progress = mediaPlayer?.currentPosition ?: 0)
+                }
 
                 delay(PLAYER_PROGRESS_UPDATE_DELAY)
             }
