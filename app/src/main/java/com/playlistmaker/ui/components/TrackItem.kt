@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +34,7 @@ fun TrackItem(
     onLongClick: ((Track) -> Unit)? = null,
 ) {
     val colors = PlaylistMakerTheme.colors
+    val trackTime = remember(track.trackTimeMillis) { formatTrackTime(track.trackTimeMillis) }
 
     Row(
         modifier = modifier
@@ -86,7 +88,7 @@ fun TrackItem(
                 )
 
                 Text(
-                    text = formatTrackTime(track.trackTimeMillis),
+                    text = trackTime,
                     style = AppTypography.small,
                     color = colors.textSecondary,
                     maxLines = 1,

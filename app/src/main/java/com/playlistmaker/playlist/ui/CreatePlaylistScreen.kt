@@ -2,11 +2,7 @@ package com.playlistmaker.playlist.ui
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -29,11 +25,7 @@ fun CreatePlaylistScreen(
 
     var isExitDialogVisible by rememberSaveable { mutableStateOf(false) }
 
-    val coverPicker = rememberLauncherForActivityResult(
-        ActivityResultContracts.PickVisualMedia()
-    ) { uri ->
-        uri?.let(viewModel::onCoverSelected)
-    }
+    val openCoverPicker = rememberCoverPicker(onCoverSelected = viewModel::onCoverSelected)
 
     val onBack = {
         if (viewModel.hasUnsavedData) {
@@ -45,33 +37,19 @@ fun CreatePlaylistScreen(
 
     BackHandler(onBack = onBack)
 
-    LaunchedEffect(state) {
-        when (val currentState = state) {
-            is CreatePlaylistState.Created -> {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.new_playlist_created_toast, currentState.playlistName),
-                    Toast.LENGTH_SHORT
-                ).show()
+    PlaylistSaveResultEffect(
+        state = state,
+        onResetState = viewModel::resetState,
+        onSaved = { playlistName ->
+            Toast.makeText(
+                context,
+                context.getString(R.string.new_playlist_created_toast, playlistName),
+                Toast.LENGTH_SHORT
+            ).show()
 
-                viewModel.resetState()
-                onBackClick()
-            }
-
-            is CreatePlaylistState.Error -> {
-                Toast.makeText(
-                    context,
-                    R.string.new_playlist_creation_error,
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                viewModel.resetState()
-            }
-
-            CreatePlaylistState.Editing,
-            CreatePlaylistState.Saving -> Unit
-        }
-    }
+            onBackClick()
+        },
+    )
 
     PlaylistEditorContent(
         title = stringResource(R.string.new_playlist_screen_title),
@@ -79,11 +57,7 @@ fun CreatePlaylistScreen(
         form = form,
         isSaveButtonEnabled = form.isSaveButtonEnabled && state != CreatePlaylistState.Saving,
         onBackClick = onBack,
-        onCoverClick = {
-            coverPicker.launch(
-                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-            )
-        },
+        onCoverClick = openCoverPicker,
         onNameChange = viewModel::onNameChanged,
         onDescriptionChange = viewModel::onDescriptionChanged,
         onSaveClick = viewModel::createPlaylist,

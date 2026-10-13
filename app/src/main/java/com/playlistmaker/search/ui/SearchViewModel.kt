@@ -25,8 +25,6 @@ class SearchViewModel(
 
     private var latestSearchText = ""
 
-    private var isSearchFocused: Boolean? = null
-
     private var searchJob: Job? = null
 
     fun onSearchTextChanged(text: String) {
@@ -56,17 +54,14 @@ class SearchViewModel(
         searchRequest(text)
     }
 
-    fun onSearchFocusChanged(hasFocus: Boolean) {
-        val wasFocused = isSearchFocused
-        if (wasFocused == hasFocus) return
+    fun onSearchFocused() {
+        if (latestSearchText.isEmpty()) {
+            showHistoryIfNeeded()
+        }
+    }
 
-        isSearchFocused = hasFocus
-
-        if (hasFocus) {
-            if (latestSearchText.isEmpty()) {
-                showHistoryIfNeeded()
-            }
-        } else if (wasFocused == true && stateLiveData.value is SearchState.History) {
+    fun onSearchFocusLost() {
+        if (stateLiveData.value is SearchState.History) {
             stateLiveData.value = SearchState.NothingFound
         }
     }

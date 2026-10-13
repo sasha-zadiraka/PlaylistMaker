@@ -1,42 +1,80 @@
 package com.playlistmaker.main.ui.navigation
 
-import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.example.playlistmaker.R
-import com.google.gson.Gson
 import com.playlistmaker.search.domain.models.Track
+import kotlinx.serialization.Serializable
 
-sealed class Screen(val route: String) {
+sealed interface Screen {
 
-    data object Search : Screen("search")
+    @Serializable
+    data object Search : Screen
 
-    data object MediaLibrary : Screen("media_library")
+    @Serializable
+    data object MediaLibrary : Screen
 
-    data object Settings : Screen("settings")
+    @Serializable
+    data object Settings : Screen
 
-    data object Player : Screen("player/{$ARG_TRACK}") {
-        fun createRoute(track: Track): String = "player/${Uri.encode(gson.toJson(track))}"
+    /**
+     * Трек передаётся примитивными полями: так маршрут сериализуется
+     * без изменений в domain-модели [Track].
+     */
+    @Serializable
+    data class Player(
+        val trackId: Long,
+        val trackName: String,
+        val artistName: String,
+        val trackTimeMillis: Long,
+        val artworkUrl100: String,
+        val collectionName: String,
+        val releaseDate: String,
+        val primaryGenreName: String,
+        val country: String,
+        val previewUrl: String,
+        val isFavorite: Boolean,
+    ) : Screen {
 
-        fun parseTrack(json: String): Track = gson.fromJson(json, Track::class.java)
+        fun toTrack(): Track = Track(
+            trackId = trackId,
+            trackName = trackName,
+            artistName = artistName,
+            trackTimeMillis = trackTimeMillis,
+            artworkUrl100 = artworkUrl100,
+            collectionName = collectionName,
+            releaseDate = releaseDate,
+            primaryGenreName = primaryGenreName,
+            country = country,
+            previewUrl = previewUrl,
+            isFavorite = isFavorite,
+        )
+
+        companion object {
+            fun from(track: Track) = Player(
+                trackId = track.trackId,
+                trackName = track.trackName,
+                artistName = track.artistName,
+                trackTimeMillis = track.trackTimeMillis,
+                artworkUrl100 = track.artworkUrl100,
+                collectionName = track.collectionName,
+                releaseDate = track.releaseDate,
+                primaryGenreName = track.primaryGenreName,
+                country = track.country,
+                previewUrl = track.previewUrl,
+                isFavorite = track.isFavorite,
+            )
+        }
     }
 
-    data object CreatePlaylist : Screen("create_playlist")
+    @Serializable
+    data object CreatePlaylist : Screen
 
-    data object PlaylistInfo : Screen("playlist/{$ARG_PLAYLIST_ID}") {
-        fun createRoute(playlistId: Long): String = "playlist/$playlistId"
-    }
+    @Serializable
+    data class PlaylistInfo(val playlistId: Long) : Screen
 
-    data object EditPlaylist : Screen("edit_playlist/{$ARG_PLAYLIST_ID}") {
-        fun createRoute(playlistId: Long): String = "edit_playlist/$playlistId"
-    }
-
-    companion object {
-        const val ARG_TRACK = "track"
-        const val ARG_PLAYLIST_ID = "playlistId"
-
-        private val gson = Gson()
-    }
+    @Serializable
+    data class EditPlaylist(val playlistId: Long) : Screen
 }
 
 enum class TopLevelDestination(

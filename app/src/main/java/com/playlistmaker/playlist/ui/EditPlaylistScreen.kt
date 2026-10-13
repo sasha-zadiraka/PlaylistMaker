@@ -1,13 +1,8 @@
 package com.playlistmaker.playlist.ui
 
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.playlistmaker.R
@@ -19,41 +14,20 @@ fun EditPlaylistScreen(
     onBackClick: () -> Unit,
     viewModel: EditPlaylistViewModel = koinViewModel(),
 ) {
-    val context = LocalContext.current
     val form by viewModel.form.collectAsStateWithLifecycle()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    val coverPicker = rememberLauncherForActivityResult(
-        ActivityResultContracts.PickVisualMedia()
-    ) { uri ->
-        uri?.let(viewModel::onCoverSelected)
-    }
+    val openCoverPicker = rememberCoverPicker(onCoverSelected = viewModel::onCoverSelected)
 
     LaunchedEffect(playlistId) {
         viewModel.init(playlistId)
     }
 
-    LaunchedEffect(state) {
-        when (state) {
-            is CreatePlaylistState.Created -> {
-                viewModel.resetState()
-                onBackClick()
-            }
-
-            is CreatePlaylistState.Error -> {
-                Toast.makeText(
-                    context,
-                    R.string.new_playlist_creation_error,
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                viewModel.resetState()
-            }
-
-            CreatePlaylistState.Editing,
-            CreatePlaylistState.Saving -> Unit
-        }
-    }
+    PlaylistSaveResultEffect(
+        state = state,
+        onResetState = viewModel::resetState,
+        onSaved = { onBackClick() },
+    )
 
     PlaylistEditorContent(
         title = stringResource(R.string.edit_playlist_screen_title),
@@ -61,11 +35,7 @@ fun EditPlaylistScreen(
         form = form,
         isSaveButtonEnabled = form.isSaveButtonEnabled && state != CreatePlaylistState.Saving,
         onBackClick = onBackClick,
-        onCoverClick = {
-            coverPicker.launch(
-                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-            )
-        },
+        onCoverClick = openCoverPicker,
         onNameChange = viewModel::onNameChanged,
         onDescriptionChange = viewModel::onDescriptionChanged,
         onSaveClick = viewModel::createPlaylist,

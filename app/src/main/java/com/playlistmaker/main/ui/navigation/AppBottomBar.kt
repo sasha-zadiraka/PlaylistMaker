@@ -20,7 +20,7 @@ import com.playlistmaker.ui.theme.PlaylistMakerTheme
 
 @Composable
 fun AppBottomBar(
-    currentRoute: String?,
+    selectedTab: TopLevelDestination,
     onDestinationClick: (TopLevelDestination) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -40,7 +40,7 @@ fun AppBottomBar(
         ) {
             TopLevelDestination.entries.forEach { destination ->
                 NavigationBarItem(
-                    selected = currentRoute == destination.screen.route,
+                    selected = destination == selectedTab,
                     onClick = { onDestinationClick(destination) },
                     icon = {
                         Icon(

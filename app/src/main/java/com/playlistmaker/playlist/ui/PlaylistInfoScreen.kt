@@ -10,7 +10,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -214,14 +213,28 @@ private fun PlaylistInfoContent(
     onTrackLongClick: (Track) -> Unit,
 ) {
     val density = LocalDensity.current
+    var containerHeightPx by remember { mutableIntStateOf(0) }
     var headerHeightPx by remember { mutableIntStateOf(0) }
 
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        // Шторка с треками начинается на 24dp ниже кнопок «Поделиться» и «Меню».
-        val headerHeight = with(density) { headerHeightPx.toDp() }
-        val sheetPeekHeight = (maxHeight - headerHeight - SheetTopGap)
+    // Шторка с треками начинается на 24dp ниже кнопок «Поделиться» и «Меню».
+    // Пока экран и шапка не измерены, шторку не показываем (peek = 0),
+    // иначе на первом кадре она закрывала бы почти весь экран.
+    val sheetPeekHeight = if (containerHeightPx == 0 || headerHeightPx == 0) {
+        0.dp
+    } else {
+        with(density) { (containerHeightPx - headerHeightPx).toDp() - SheetTopGap }
             .coerceAtLeast(MinSheetPeekHeight)
+    }
 
+    // modifier самого BottomSheetScaffold применяется к телу (шапке), поэтому
+    // высоту экрана меряем на внешнем контейнере. Отступ под статус-бар задаём здесь,
+    // чтобы раскрытая шторка останавливалась под ним, а не заходила под системные иконки.
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .onSizeChanged { containerHeightPx = it.height },
+    ) {
         BottomSheetScaffold(
             scaffoldState = rememberBottomSheetScaffoldState(),
             sheetPeekHeight = sheetPeekHeight,
@@ -261,9 +274,7 @@ private fun PlaylistHeader(
     val playlist = content.playlist
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .statusBarsPadding(),
+        modifier = modifier.fillMaxWidth(),
     ) {
         Box(
             modifier = Modifier

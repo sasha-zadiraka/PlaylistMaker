@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.widget.Toast
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -33,6 +34,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -53,7 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.LifecycleOwner
 import com.example.playlistmaker.R
 import com.playlistmaker.player.service.PlaybackService
 import com.playlistmaker.search.domain.models.Track
@@ -76,11 +78,19 @@ fun PlayerScreen(
     viewModel: PlayerViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
-    val state by viewModel.observeState().observeAsState(PlayerState())
+    // Прогресс обновляется каждые 300 мс. Чтобы не перерисовывать весь экран,
+    // наверху читаем только флаги, а текст прогресса — внутри PlaybackProgress.
+    val playerState = viewModel.observeState().observeAsState(PlayerState())
+    val isPlaying by remember { derivedStateOf { playerState.value.isPlaying } }
+    val isPrepared by remember { derivedStateOf { playerState.value.isPrepared } }
+    val isFavorite by remember { derivedStateOf { playerState.value.isFavorite } }
     val playlists by viewModel.observePlaylists().observeAsState(emptyList())
 
     val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    // Шторка открывается на фиксированную высоту (частично раскрытое состояние)
+    // и раскрывается на весь экран только свайпом вверх. Если плейлистов мало,
+    // шторка просто подстраивается под содержимое.
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var isPlaylistsSheetVisible by rememberSaveable { mutableStateOf(false) }
 
     val hidePlaylistsSheet: () -> Unit = {
@@ -110,7 +120,10 @@ fun PlayerScreen(
 
     PlayerContent(
         track = track,
-        state = state,
+        isPlaying = isPlaying,
+        isPrepared = isPrepared,
+        isFavorite = isFavorite,
+        progress = { playerState.value.progress },
         onBackClick = onBackClick,
         onPlayClick = viewModel::playbackControl,
         onFavoriteClick = viewModel::onFavoriteClicked,
@@ -180,12 +193,13 @@ private fun NotificationPermissionRequest() {
 
 /**
  * Уведомление о воспроизведении показывается, когда приложение уходит в фон (ON_STOP),
- * и скрывается при возвращении (ON_START).
+ * и скрывается при возвращении (ON_START). Подписываемся на жизненный цикл активити,
+ * а не NavBackStackEntry: переход на другой экран внутри приложения — это не уход в фон.
  */
 @Composable
 private fun AppForegroundTracking(viewModel: PlayerViewModel) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = LocalActivity.current as? LifecycleOwner ?: return
 
     DisposableEffect(lifecycleOwner, viewModel) {
         val observer = LifecycleEventObserver { _, event ->
@@ -209,7 +223,10 @@ private fun AppForegroundTracking(viewModel: PlayerViewModel) {
 @Composable
 private fun PlayerContent(
     track: Track,
-    state: PlayerState,
+    isPlaying: Boolean,
+    isPrepared: Boolean,
+    isFavorite: Boolean,
+    progress: () -> String,
     onBackClick: () -> Unit,
     onPlayClick: () -> Unit,
     onFavoriteClick: () -> Unit,
@@ -256,21 +273,20 @@ private fun PlayerContent(
         )
 
         PlayerControls(
-            state = state,
+            isPlaying = isPlaying,
+            isPrepared = isPrepared,
+            isFavorite = isFavorite,
             onPlayClick = onPlayClick,
             onFavoriteClick = onFavoriteClick,
             onAddToPlaylistClick = onAddToPlaylistClick,
             modifier = Modifier.padding(start = 24.dp, top = 30.dp, end = 24.dp),
         )
 
-        Text(
-            text = state.progress,
+        PlaybackProgress(
+            progress = progress,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),
-            style = AppTypography.button,
-            color = colors.textPrimary,
-            textAlign = TextAlign.Center,
         )
 
         TrackDetails(
@@ -281,8 +297,24 @@ private fun PlayerContent(
 }
 
 @Composable
+private fun PlaybackProgress(
+    progress: () -> String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = progress(),
+        modifier = modifier,
+        style = AppTypography.button,
+        color = PlaylistMakerTheme.colors.textPrimary,
+        textAlign = TextAlign.Center,
+    )
+}
+
+@Composable
 private fun PlayerControls(
-    state: PlayerState,
+    isPlaying: Boolean,
+    isPrepared: Boolean,
+    isFavorite: Boolean,
     onPlayClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     onAddToPlaylistClick: () -> Unit,
@@ -299,13 +331,13 @@ private fun PlayerControls(
         )
 
         PlaybackButton(
-            isPlaying = state.isPlaying,
-            enabled = state.isPrepared,
+            isPlaying = isPlaying,
+            enabled = isPrepared,
             onClick = onPlayClick,
         )
 
         PlayerSecondaryButton(
-            iconRes = if (state.isFavorite) {
+            iconRes = if (isFavorite) {
                 R.drawable.ic_favorite_active_23
             } else {
                 R.drawable.ic_add_to_favorite_23

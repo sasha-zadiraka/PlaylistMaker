@@ -9,10 +9,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.playlistmaker.medialibrary.ui.MediaLibraryScreen
 import com.playlistmaker.player.ui.PlayerScreen
 import com.playlistmaker.playlist.ui.CreatePlaylistScreen
@@ -30,92 +29,80 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
 ) {
     val openPlayer: (Track) -> Unit = { track ->
-        navController.navigate(Screen.Player.createRoute(track))
+        navController.navigate(Screen.Player.from(track))
     }
     val navigateBack: () -> Unit = { navController.popBackStack() }
 
     NavHost(
         navController = navController,
-        startDestination = Screen.MediaLibrary.route,
+        startDestination = Screen.MediaLibrary,
         modifier = modifier,
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None },
     ) {
-        composable(Screen.Search.route) {
+        composable<Screen.Search> {
             SearchScreen(onTrackClick = openPlayer)
         }
 
-        composable(Screen.MediaLibrary.route) {
+        composable<Screen.MediaLibrary> {
             MediaLibraryScreen(
                 onTrackClick = openPlayer,
                 onPlaylistClick = { playlistId ->
-                    navController.navigate(Screen.PlaylistInfo.createRoute(playlistId))
+                    navController.navigate(Screen.PlaylistInfo(playlistId))
                 },
                 onNewPlaylistClick = {
-                    navController.navigate(Screen.CreatePlaylist.route)
+                    navController.navigate(Screen.CreatePlaylist)
                 },
             )
         }
 
-        composable(Screen.Settings.route) {
+        composable<Screen.Settings> {
             SettingsScreen()
         }
 
-        composable(
-            route = Screen.Player.route,
-            arguments = listOf(navArgument(Screen.ARG_TRACK) { type = NavType.StringType }),
+        composable<Screen.Player>(
             enterTransition = { slideInFromEnd() },
             popExitTransition = { slideOutToEnd() },
         ) { backStackEntry ->
-            val track = rememberTrackArgument(backStackEntry)
+            val track = remember(backStackEntry) {
+                backStackEntry.toRoute<Screen.Player>().toTrack()
+            }
 
             PlayerScreen(
                 track = track,
                 onBackClick = navigateBack,
                 onNewPlaylistClick = {
-                    navController.navigate(Screen.CreatePlaylist.route)
+                    navController.navigate(Screen.CreatePlaylist)
                 },
             )
         }
 
-        composable(Screen.CreatePlaylist.route) {
+        composable<Screen.CreatePlaylist> {
             CreatePlaylistScreen(onBackClick = navigateBack)
         }
 
-        composable(
-            route = Screen.PlaylistInfo.route,
-            arguments = listOf(navArgument(Screen.ARG_PLAYLIST_ID) { type = NavType.LongType }),
-        ) { backStackEntry ->
-            val playlistId = backStackEntry.arguments?.getLong(Screen.ARG_PLAYLIST_ID) ?: return@composable
+        composable<Screen.PlaylistInfo> { backStackEntry ->
+            val route = backStackEntry.toRoute<Screen.PlaylistInfo>()
 
             PlaylistInfoScreen(
-                playlistId = playlistId,
+                playlistId = route.playlistId,
                 onBackClick = navigateBack,
                 onTrackClick = openPlayer,
                 onEditClick = { id ->
-                    navController.navigate(Screen.EditPlaylist.createRoute(id))
+                    navController.navigate(Screen.EditPlaylist(id))
                 },
             )
         }
 
-        composable(
-            route = Screen.EditPlaylist.route,
-            arguments = listOf(navArgument(Screen.ARG_PLAYLIST_ID) { type = NavType.LongType }),
-        ) { backStackEntry ->
-            val playlistId = backStackEntry.arguments?.getLong(Screen.ARG_PLAYLIST_ID) ?: return@composable
+        composable<Screen.EditPlaylist> { backStackEntry ->
+            val route = backStackEntry.toRoute<Screen.EditPlaylist>()
 
             EditPlaylistScreen(
-                playlistId = playlistId,
+                playlistId = route.playlistId,
                 onBackClick = navigateBack,
             )
         }
     }
-}
-
-@Composable
-private fun rememberTrackArgument(backStackEntry: NavBackStackEntry): Track {
-    val json = backStackEntry.arguments?.getString(Screen.ARG_TRACK).orEmpty()
-    return remember(json) { Screen.Player.parseTrack(json) }
 }
 
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInFromEnd(): EnterTransition =

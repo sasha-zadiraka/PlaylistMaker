@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -53,10 +54,12 @@ fun SearchScreen(
     viewModel: SearchViewModel = koinViewModel(),
 ) {
     val state by viewModel.observeState().observeAsState()
-    val searchText by viewModel.observeSearchText().observeAsState("")
+    // observeAsState() без аргумента стартует с текущего значения LiveData,
+    // поэтому при возврате на экран текст запроса доступен уже в первой композиции.
+    val searchText by viewModel.observeSearchText().observeAsState()
 
     LaunchedEffect(Unit) {
-        if (viewModel.observeSearchText().value.isNullOrEmpty()) {
+        if (searchText.isNullOrEmpty()) {
             viewModel.showHistoryIfNeeded()
         }
     }
@@ -75,17 +78,18 @@ fun SearchScreen(
         ScreenTitle(text = stringResource(R.string.screen_search_title))
 
         SearchField(
-            text = searchText,
+            text = searchText.orEmpty(),
             onTextChange = viewModel::onSearchTextChanged,
-            onSearch = { viewModel.searchImmediately(searchText) },
-            onFocusChange = viewModel::onSearchFocusChanged,
+            onSearch = { viewModel.searchImmediately(searchText.orEmpty()) },
+            onFocused = viewModel::onSearchFocused,
+            onFocusLost = viewModel::onSearchFocusLost,
             modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp),
         )
 
         SearchContent(
             state = state,
             onTrackClick = onTrackClickDebounced,
-            onRetryClick = { viewModel.searchImmediately(searchText) },
+            onRetryClick = { viewModel.searchImmediately(searchText.orEmpty()) },
             onClearHistoryClick = viewModel::clearHistory,
         )
     }
@@ -96,11 +100,17 @@ private fun SearchField(
     text: String,
     onTextChange: (String) -> Unit,
     onSearch: () -> Unit,
-    onFocusChange: (Boolean) -> Unit,
+    onFocused: () -> Unit,
+    onFocusLost: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = PlaylistMakerTheme.colors
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    // onFocusChanged срабатывает и при первой композиции (поле ещё без фокуса).
+    // Потерей фокуса считаем только переход «был фокус → нет фокуса».
+    // Значение не участвует в отрисовке, поэтому это обычный объект, а не State.
+    val focusTracker = remember { FocusTracker() }
 
     BasicTextField(
         value = text,
@@ -108,7 +118,19 @@ private fun SearchField(
         modifier = modifier
             .fillMaxWidth()
             .height(36.dp)
-            .onFocusChanged { focusState -> onFocusChange(focusState.isFocused) },
+            .onFocusChanged { focusState ->
+                when {
+                    focusState.isFocused -> {
+                        focusTracker.hadFocus = true
+                        onFocused()
+                    }
+
+                    focusTracker.hadFocus -> {
+                        focusTracker.hadFocus = false
+                        onFocusLost()
+                    }
+                }
+            },
         singleLine = true,
         textStyle = AppTypography.primary.copy(color = colors.searchFieldText),
         cursorBrush = SolidColor(YpBlue),
@@ -281,4 +303,8 @@ private fun SearchHistory(
             )
         }
     }
+}
+
+private class FocusTracker {
+    var hadFocus = false
 }
