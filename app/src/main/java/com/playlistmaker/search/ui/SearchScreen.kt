@@ -27,6 +27,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -111,6 +113,7 @@ private fun SearchField(
     // Потерей фокуса считаем только переход «был фокус → нет фокуса».
     // Значение не участвует в отрисовке, поэтому это обычный объект, а не State.
     val focusTracker = remember { FocusTracker() }
+    val focusRequester = remember { FocusRequester() }
 
     BasicTextField(
         value = text,
@@ -118,6 +121,7 @@ private fun SearchField(
         modifier = modifier
             .fillMaxWidth()
             .height(36.dp)
+            .focusRequester(focusRequester)
             .onFocusChanged { focusState ->
                 when {
                     focusState.isFocused -> {
@@ -173,7 +177,11 @@ private fun SearchField(
 
                 ClearTextButton(
                     visible = text.isNotEmpty(),
-                    onClick = { onTextChange("") },
+                    onClick = {
+                        onTextChange("")
+                        focusRequester.requestFocus()
+                        keyboardController?.show()
+                    },
                 )
             }
         },

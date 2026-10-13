@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -17,7 +18,6 @@ import com.playlistmaker.player.ui.PlayerScreen
 import com.playlistmaker.playlist.ui.CreatePlaylistScreen
 import com.playlistmaker.playlist.ui.EditPlaylistScreen
 import com.playlistmaker.playlist.ui.PlaylistInfoScreen
-import com.playlistmaker.search.domain.models.Track
 import com.playlistmaker.search.ui.SearchScreen
 import com.playlistmaker.settings.ui.SettingsScreen
 
@@ -28,11 +28,6 @@ fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
-    val openPlayer: (Track) -> Unit = { track ->
-        navController.navigate(Screen.Player.from(track))
-    }
-    val navigateBack: () -> Unit = { navController.popBackStack() }
-
     NavHost(
         navController = navController,
         startDestination = Screen.MediaLibrary,
@@ -40,19 +35,19 @@ fun AppNavHost(
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None },
     ) {
-        composable<Screen.Search> {
-            SearchScreen(onTrackClick = openPlayer)
+        composable<Screen.Search> { entry ->
+            SearchScreen(
+                onTrackClick = { track -> entry.navigate(navController, Screen.Player.from(track)) },
+            )
         }
 
-        composable<Screen.MediaLibrary> {
+        composable<Screen.MediaLibrary> { entry ->
             MediaLibraryScreen(
-                onTrackClick = openPlayer,
+                onTrackClick = { track -> entry.navigate(navController, Screen.Player.from(track)) },
                 onPlaylistClick = { playlistId ->
-                    navController.navigate(Screen.PlaylistInfo(playlistId))
+                    entry.navigate(navController, Screen.PlaylistInfo(playlistId))
                 },
-                onNewPlaylistClick = {
-                    navController.navigate(Screen.CreatePlaylist)
-                },
+                onNewPlaylistClick = { entry.navigate(navController, Screen.CreatePlaylist) },
             )
         }
 
@@ -63,47 +58,61 @@ fun AppNavHost(
         composable<Screen.Player>(
             enterTransition = { slideInFromEnd() },
             popExitTransition = { slideOutToEnd() },
-        ) { backStackEntry ->
-            val track = remember(backStackEntry) {
-                backStackEntry.toRoute<Screen.Player>().toTrack()
-            }
+        ) { entry ->
+            val track = remember(entry) { entry.toRoute<Screen.Player>().toTrack() }
 
             PlayerScreen(
                 track = track,
-                onBackClick = navigateBack,
-                onNewPlaylistClick = {
-                    navController.navigate(Screen.CreatePlaylist)
-                },
+                onBackClick = { entry.navigateBack(navController) },
+                onNewPlaylistClick = { entry.navigate(navController, Screen.CreatePlaylist) },
             )
         }
 
-        composable<Screen.CreatePlaylist> {
-            CreatePlaylistScreen(onBackClick = navigateBack)
+        composable<Screen.CreatePlaylist> { entry ->
+            CreatePlaylistScreen(onBackClick = { entry.navigateBack(navController) })
         }
 
-        composable<Screen.PlaylistInfo> { backStackEntry ->
-            val route = backStackEntry.toRoute<Screen.PlaylistInfo>()
+        composable<Screen.PlaylistInfo> { entry ->
+            val route = entry.toRoute<Screen.PlaylistInfo>()
 
             PlaylistInfoScreen(
                 playlistId = route.playlistId,
-                onBackClick = navigateBack,
-                onTrackClick = openPlayer,
-                onEditClick = { id ->
-                    navController.navigate(Screen.EditPlaylist(id))
-                },
+                onBackClick = { entry.navigateBack(navController) },
+                onTrackClick = { track -> entry.navigate(navController, Screen.Player.from(track)) },
+                onEditClick = { id -> entry.navigate(navController, Screen.EditPlaylist(id)) },
             )
         }
 
-        composable<Screen.EditPlaylist> { backStackEntry ->
-            val route = backStackEntry.toRoute<Screen.EditPlaylist>()
+        composable<Screen.EditPlaylist> { entry ->
+            val route = entry.toRoute<Screen.EditPlaylist>()
 
             EditPlaylistScreen(
                 playlistId = route.playlistId,
-                onBackClick = navigateBack,
+                onBackClick = { entry.navigateBack(navController) },
             )
         }
     }
 }
+
+/**
+ * Переходы выполняем, только пока экран, который их инициирует, активен (RESUMED).
+ * Во время анимации перехода экран уже не RESUMED, поэтому повторный тап
+ * (двойное нажатие «Назад» или по элементу списка) не откроет/не закроет лишний экран.
+ */
+private fun NavBackStackEntry.navigate(navController: NavHostController, screen: Screen) {
+    if (isResumed()) {
+        navController.navigate(screen)
+    }
+}
+
+private fun NavBackStackEntry.navigateBack(navController: NavHostController) {
+    if (isResumed()) {
+        navController.popBackStack()
+    }
+}
+
+private fun NavBackStackEntry.isResumed(): Boolean =
+    lifecycle.currentState == Lifecycle.State.RESUMED
 
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInFromEnd(): EnterTransition =
     slideIntoContainer(

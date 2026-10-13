@@ -13,10 +13,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -382,11 +384,13 @@ private fun PlaylistTracks(
         return
     }
 
+    // Отступ под системную панель навигации — в contentPadding, а не модификатором:
+    // так список прокручивается под панелью, а последний трек всё равно доступен.
+    val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .navigationBarsPadding(),
-        contentPadding = PaddingValues(top = 12.dp, bottom = 16.dp),
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(top = 12.dp, bottom = 16.dp + navigationBarPadding),
     ) {
         items(items = tracks, key = { it.trackId }) { track ->
             TrackItem(
