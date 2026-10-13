@@ -7,6 +7,7 @@ import com.playlistmaker.playlist.domain.PlaylistInteractor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 open class CreatePlaylistViewModel(
@@ -21,17 +22,19 @@ open class CreatePlaylistViewModel(
     val state: StateFlow<CreatePlaylistState> =
         _state.asStateFlow()
 
-    var playlistName: String = ""
-        private set
+    protected val _form = MutableStateFlow(PlaylistFormState())
 
-    var playlistDescription: String = ""
-        private set
+    val form: StateFlow<PlaylistFormState> =
+        _form.asStateFlow()
 
-    var selectedCoverUri: Uri? = null
-        private set
+    val playlistName: String
+        get() = _form.value.name
 
-    val isCreateButtonEnabled: Boolean
-        get() = playlistName.isNotBlank()
+    val playlistDescription: String
+        get() = _form.value.description
+
+    val selectedCoverUri: Uri?
+        get() = _form.value.coverUri
 
     open val hasUnsavedData: Boolean
         get() = playlistName.isNotBlank() ||
@@ -39,15 +42,15 @@ open class CreatePlaylistViewModel(
                 selectedCoverUri != null
 
     fun onNameChanged(name: String) {
-        playlistName = name
+        _form.update { it.copy(name = name) }
     }
 
     fun onDescriptionChanged(description: String) {
-        playlistDescription = description
+        _form.update { it.copy(description = description) }
     }
 
     fun onCoverSelected(uri: Uri) {
-        selectedCoverUri = uri
+        _form.update { it.copy(coverUri = uri) }
     }
 
     open fun createPlaylist() {

@@ -11,7 +11,7 @@
         <item name="android:statusBarColor">@color/yp_black</item>
         <!-- Customize your theme here. -->
         <item name="colorOnPrimaryFixed">@color/yp_black</item>
-        <item name="android:background">@color/yp_black</item>
+        <item name="android:windowBackground">@color/yp_black</item>
         <item name="colorOnBackground">@color/yp_blue</item>
         <item name="colorOnSecondaryContainer">@color/white</item>
         <item name="colorAccent">@color/white</item>

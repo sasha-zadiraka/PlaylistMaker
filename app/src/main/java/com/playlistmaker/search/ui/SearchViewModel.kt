@@ -20,13 +20,19 @@ class SearchViewModel(
     private val stateLiveData = MutableLiveData<SearchState>()
     fun observeState(): LiveData<SearchState> = stateLiveData
 
+    private val searchTextLiveData = MutableLiveData("")
+    fun observeSearchText(): LiveData<String> = searchTextLiveData
+
     private var latestSearchText = ""
+
+    private var isSearchFocused: Boolean? = null
 
     private var searchJob: Job? = null
 
     fun onSearchTextChanged(text: String) {
         searchJob?.cancel()
         latestSearchText = text
+        searchTextLiveData.value = text
 
         if (text.isEmpty()) {
             stateLiveData.value = SearchState.NothingFound
@@ -48,6 +54,21 @@ class SearchViewModel(
         }
 
         searchRequest(text)
+    }
+
+    fun onSearchFocusChanged(hasFocus: Boolean) {
+        val wasFocused = isSearchFocused
+        if (wasFocused == hasFocus) return
+
+        isSearchFocused = hasFocus
+
+        if (hasFocus) {
+            if (latestSearchText.isEmpty()) {
+                showHistoryIfNeeded()
+            }
+        } else if (wasFocused == true && stateLiveData.value is SearchState.History) {
+            stateLiveData.value = SearchState.NothingFound
+        }
     }
 
     fun showHistoryIfNeeded() {

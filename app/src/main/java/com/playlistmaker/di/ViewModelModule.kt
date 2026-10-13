@@ -1,6 +1,5 @@
 package com.playlistmaker.di
 
-import com.playlistmaker.medialibrary.ui.MediaLibraryViewModel
 import com.playlistmaker.medialibrary.ui.favorites.FavoriteTracksViewModel
 import com.playlistmaker.medialibrary.ui.playlists.PlaylistsViewModel
 import com.playlistmaker.player.ui.PlayerViewModel
@@ -33,10 +32,6 @@ val viewModelModule = module {
             themeInteractor = get(),
             sharingInteractor = get()
         )
-    }
-
-    viewModel {
-        MediaLibraryViewModel()
     }
 
     viewModel {

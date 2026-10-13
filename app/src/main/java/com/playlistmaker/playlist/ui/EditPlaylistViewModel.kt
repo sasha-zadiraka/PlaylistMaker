@@ -34,6 +34,12 @@ class EditPlaylistViewModel(
                 ?: return@launch
 
             _editingPlaylist.value = playlist
+
+            _form.value = PlaylistFormState(
+                name = playlist.name,
+                description = playlist.description,
+                currentCoverPath = playlist.coverPath
+            )
         }
     }
 

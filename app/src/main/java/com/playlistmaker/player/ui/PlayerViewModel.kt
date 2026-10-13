@@ -11,6 +11,9 @@ import com.playlistmaker.playlist.domain.Playlist
 import com.playlistmaker.playlist.domain.PlaylistInteractor
 import com.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -31,11 +34,11 @@ class PlayerViewModel(
     fun observePlaylists(): LiveData<List<Playlist>> =
         playlistsLiveData
 
-    private val addTrackResultLiveData =
-        MutableLiveData<AddTrackToPlaylistResult>()
+    private val addTrackResultEvents =
+        MutableSharedFlow<AddTrackToPlaylistResult>(extraBufferCapacity = 1)
 
-    fun observeAddTrackResult(): LiveData<AddTrackToPlaylistResult> =
-        addTrackResultLiveData
+    fun observeAddTrackResult(): SharedFlow<AddTrackToPlaylistResult> =
+        addTrackResultEvents.asSharedFlow()
 
     private var currentTrack: Track? = null
 
@@ -85,10 +88,11 @@ class PlayerViewModel(
         val track = currentTrack ?: return
 
         if (playlist.trackIds.contains(track.trackId)) {
-            addTrackResultLiveData.value =
+            addTrackResultEvents.tryEmit(
                 AddTrackToPlaylistResult.AlreadyAdded(
                     playlistName = playlist.name
                 )
+            )
 
             return
         }
@@ -101,14 +105,16 @@ class PlayerViewModel(
                 )
             }
                 .onSuccess {
-                    addTrackResultLiveData.value =
+                    addTrackResultEvents.tryEmit(
                         AddTrackToPlaylistResult.Added(
                             playlistName = playlist.name
                         )
+                    )
                 }
                 .onFailure {
-                    addTrackResultLiveData.value =
+                    addTrackResultEvents.tryEmit(
                         AddTrackToPlaylistResult.Error
+                    )
                 }
         }
     }

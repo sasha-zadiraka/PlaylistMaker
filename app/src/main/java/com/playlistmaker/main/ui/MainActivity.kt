@@ -3,15 +3,10 @@ package com.playlistmaker.main.ui
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
-import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivityMainBinding
+import com.playlistmaker.ui.theme.PlaylistMakerTheme
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
@@ -27,92 +22,14 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private lateinit var binding: ActivityMainBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        setupNavigation()
-        setupInsets()
-    }
-
-    private fun setupNavigation() {
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-
-        val navController = navHostFragment.navController
-
-        binding.bottomNavigationView.setupWithNavController(navController)
-
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            updateBottomNavigationVisibility(
-                destinationId = destination.id,
-                isKeyboardVisible = false
-            )
+        setContent {
+            PlaylistMakerTheme {
+                PlaylistMakerApp()
+            }
         }
-    }
-
-    private fun setupInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { _, insets ->
-
-            val systemBars = insets.getInsets(
-                WindowInsetsCompat.Type.systemBars()
-            )
-
-            val isKeyboardVisible = insets.isVisible(
-                WindowInsetsCompat.Type.ime()
-            )
-
-            binding.navHostFragment.updatePadding(
-                top = systemBars.top
-            )
-
-            binding.bottomNavigationView.updatePadding(
-                bottom = systemBars.bottom
-            )
-
-            updateBottomNavigationVisibility(
-                destinationId = getCurrentDestinationId(),
-                isKeyboardVisible = isKeyboardVisible
-            )
-
-            insets
-        }
-    }
-
-    private fun updateBottomNavigationVisibility(
-        destinationId: Int?,
-        isKeyboardVisible: Boolean
-    ) {
-        val isDestinationWithoutBottomNavigation =
-            destinationId == R.id.playerFragment ||
-                    destinationId == R.id.createPlaylistFragment ||
-                    destinationId == R.id.playlistInfoFragment ||
-                    destinationId == R.id.editPlaylistFragment
-
-        val isBottomNavigationVisible =
-            !isKeyboardVisible &&
-                    !isDestinationWithoutBottomNavigation
-
-        binding.bottomNavigationView.isVisible =
-            isBottomNavigationVisible
-
-        binding.bottomNavigationDivider.isVisible =
-            isBottomNavigationVisible
-    }
-
-    private fun getCurrentDestinationId(): Int? {
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(
-                R.id.nav_host_fragment
-            ) as? NavHostFragment
-
-        return navHostFragment
-            ?.navController
-            ?.currentDestination
-            ?.id
     }
 }
