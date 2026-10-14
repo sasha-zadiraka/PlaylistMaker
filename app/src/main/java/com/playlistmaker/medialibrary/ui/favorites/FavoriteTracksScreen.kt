@@ -6,10 +6,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.playlistmaker.R
 import com.playlistmaker.search.domain.models.Track
 import com.playlistmaker.ui.components.PlaceholderMessage
@@ -22,7 +22,7 @@ fun FavoriteTracksScreen(
     onTrackClick: (Track) -> Unit,
     viewModel: FavoriteTracksViewModel = koinViewModel(),
 ) {
-    val state by viewModel.observeState().observeAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val onTrackClickDebounced = rememberDebouncedClick(action = onTrackClick)
 
     when (val currentState = state) {
@@ -41,6 +41,6 @@ fun FavoriteTracksScreen(
             }
         }
 
-        null -> Unit
+        FavoriteTracksState.Loading -> Unit
     }
 }
