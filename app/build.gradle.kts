@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-    id("org.jetbrains.kotlin.kapt")
     id("kotlin-parcelize")
     alias(libs.plugins.ksp)
 }
@@ -56,9 +55,6 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp.logging)
-    implementation(libs.moxy)
-    implementation(libs.moxy.android)
-    add("kapt", libs.moxy.compiler)
     implementation(libs.koin.android)
     implementation(platform(libs.koin.bom))
     implementation(libs.kotlinx.coroutines.android)
