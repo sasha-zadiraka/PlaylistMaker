@@ -10,11 +10,13 @@ import com.playlistmaker.player.service.PlaybackStatus
 import com.playlistmaker.playlist.domain.Playlist
 import com.playlistmaker.playlist.domain.PlaylistInteractor
 import com.playlistmaker.search.domain.models.Track
+import com.playlistmaker.util.formatTrackTime
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class PlayerViewModel(
     private val favoriteTracksInteractor: FavoriteTracksInteractor,
@@ -31,11 +33,11 @@ class PlayerViewModel(
     fun observePlaylists(): LiveData<List<Playlist>> =
         playlistsLiveData
 
-    private val addTrackResultLiveData =
-        MutableLiveData<AddTrackToPlaylistResult>()
+    private val addTrackResultEvents =
+        MutableSharedFlow<AddTrackToPlaylistResult>(extraBufferCapacity = 1)
 
-    fun observeAddTrackResult(): LiveData<AddTrackToPlaylistResult> =
-        addTrackResultLiveData
+    fun observeAddTrackResult(): SharedFlow<AddTrackToPlaylistResult> =
+        addTrackResultEvents.asSharedFlow()
 
     private var currentTrack: Track? = null
 
@@ -43,6 +45,10 @@ class PlayerViewModel(
     private var stateCollectionJob: Job? = null
 
     fun setTrack(track: Track) {
+        // Экран вызывает setTrack при каждом входе в композицию (в т.ч. после возврата
+        // с «Нового плейлиста»), а аргумент маршрута хранит isFavorite на момент открытия.
+        if (currentTrack?.trackId == track.trackId) return
+
         currentTrack = track
 
         stateLiveData.value = stateLiveData.value?.copy(
@@ -85,10 +91,11 @@ class PlayerViewModel(
         val track = currentTrack ?: return
 
         if (playlist.trackIds.contains(track.trackId)) {
-            addTrackResultLiveData.value =
+            addTrackResultEvents.tryEmit(
                 AddTrackToPlaylistResult.AlreadyAdded(
                     playlistName = playlist.name
                 )
+            )
 
             return
         }
@@ -101,14 +108,16 @@ class PlayerViewModel(
                 )
             }
                 .onSuccess {
-                    addTrackResultLiveData.value =
+                    addTrackResultEvents.tryEmit(
                         AddTrackToPlaylistResult.Added(
                             playlistName = playlist.name
                         )
+                    )
                 }
                 .onFailure {
-                    addTrackResultLiveData.value =
+                    addTrackResultEvents.tryEmit(
                         AddTrackToPlaylistResult.Error
+                    )
                 }
         }
     }
@@ -158,10 +167,7 @@ class PlayerViewModel(
     }
 
     private fun formatTime(position: Int): String {
-        return SimpleDateFormat(
-            "mm:ss",
-            Locale.getDefault()
-        ).format(position)
+        return formatTrackTime(position.toLong())
     }
 
     override fun onCleared() {

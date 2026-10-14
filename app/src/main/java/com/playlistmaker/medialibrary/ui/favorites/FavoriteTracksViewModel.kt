@@ -1,18 +1,23 @@
 package com.playlistmaker.medialibrary.ui.favorites
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.playlistmaker.medialibrary.domain.FavoriteTracksInteractor
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class FavoriteTracksViewModel(
     private val favoriteTracksInteractor: FavoriteTracksInteractor
 ) : ViewModel() {
 
-    private val stateLiveData = MutableLiveData<FavoriteTracksState>()
-    fun observeState(): LiveData<FavoriteTracksState> = stateLiveData
+    private val _state = MutableStateFlow<FavoriteTracksState>(
+        FavoriteTracksState.Loading
+    )
+
+    val state: StateFlow<FavoriteTracksState> =
+        _state.asStateFlow()
 
     init {
         observeFavoriteTracks()
@@ -22,7 +27,7 @@ class FavoriteTracksViewModel(
         viewModelScope.launch {
             favoriteTracksInteractor.getFavoriteTracks()
                 .collect { tracks ->
-                    stateLiveData.value =
+                    _state.value =
                         if (tracks.isEmpty()) {
                             FavoriteTracksState.Empty
                         } else {

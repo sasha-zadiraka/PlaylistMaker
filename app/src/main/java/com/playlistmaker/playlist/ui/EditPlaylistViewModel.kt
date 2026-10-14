@@ -4,8 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.playlistmaker.playlist.domain.Playlist
 import com.playlistmaker.playlist.domain.PlaylistInteractor
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -15,9 +13,6 @@ class EditPlaylistViewModel(
 
     private val _editingPlaylist =
         MutableStateFlow<Playlist?>(null)
-
-    val editingPlaylist: StateFlow<Playlist?> =
-        _editingPlaylist.asStateFlow()
 
     override val hasUnsavedData: Boolean
         get() = false
@@ -34,6 +29,12 @@ class EditPlaylistViewModel(
                 ?: return@launch
 
             _editingPlaylist.value = playlist
+
+            _form.value = PlaylistFormState(
+                name = playlist.name,
+                description = playlist.description,
+                currentCoverPath = playlist.coverPath
+            )
         }
     }
 

@@ -50,7 +50,6 @@
 
     // playlist screen
     <string name="screen_playlist_title">Плейлист</string>
-    <string name="screen_playlist_duration_and_tracks">%1$s • %2$s</string>
     <plurals name="screen_playlist_duration_minutes">
         <item quantity="one">%d минута</item>
         <item quantity="few">%d минуты</item>

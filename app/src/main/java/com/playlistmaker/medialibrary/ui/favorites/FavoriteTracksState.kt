@@ -4,6 +4,8 @@ import com.playlistmaker.search.domain.models.Track
 
 sealed interface FavoriteTracksState {
 
+    data object Loading : FavoriteTracksState
+
     data object Empty : FavoriteTracksState
 
     data class Content(
